@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Quicksand } from "next/font/google";
 import "./globals.css";
 import { ThemeModeProvider } from "@/context/ThemeContext";
+import Header from "@/components/Header/Header";
 
 const quicksand = Quicksand({
   variable: "--font-quicksand", 
@@ -24,7 +25,10 @@ export default function RootLayout({
       <body
         className={`${quicksand.variable} antialiased`}
       >
-        <ThemeModeProvider>{children}</ThemeModeProvider>
+        <ThemeModeProvider>
+          <Header />
+          <main>{children}</main>
+        </ThemeModeProvider>
       </body>
     </html>
   );
