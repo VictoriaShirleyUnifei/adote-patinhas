@@ -6,6 +6,7 @@ import { ThemeProvider, createTheme, CssBaseline } from "@mui/material";
 // Extensão do Palette do MUI
 declare module "@mui/material/styles" {
   interface Palette {
+    tertiary: Palette["primary"];
     card: {
       default: string;
     };
@@ -16,6 +17,7 @@ declare module "@mui/material/styles" {
     };
   }
   interface PaletteOptions {
+    tertiary?: PaletteOptions["primary"];
     card?: {
       default: string;
     };
@@ -56,6 +58,7 @@ export function ThemeModeProvider({ children }: { children: React.ReactNode }) {
             ? {
                 primary: { main: "#516953" },
                 secondary: { main: "#CD8C52" },
+                tertiary: { main: "#5E3929" },
                 background: { default: "#B7D1A3", paper: "#FFFFFF" },
                 card: { default: "#F2F1EB"},
                 text: { primary: "#5E3929", secondary: "#A9A9A9" },
@@ -68,6 +71,7 @@ export function ThemeModeProvider({ children }: { children: React.ReactNode }) {
             : {
                 primary: { main: "#3A4A3C" },
                 secondary: { main: "#A86A3F" },
+                tertiary: { main: "#5E3929" },
                 background: { default: "#101411", paper: "#101411" },
                 card: {default: "#252525"},
                 text: { primary: "#F2F1EB", secondary: "#A9A9A9" },
