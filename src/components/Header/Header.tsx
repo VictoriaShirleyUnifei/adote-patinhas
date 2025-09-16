@@ -3,6 +3,7 @@
 import { useTheme } from "@mui/material/styles";
 import ButtonTheme from "../ButtonTheme";
 import HeaderMenu from "./HeaderMenu";
+import Image from "next/image";
 
 export default function Header() {
   const theme = useTheme();
@@ -20,7 +21,7 @@ export default function Header() {
       }}
     >
       <div className="flex items-center gap-2">
-        <img src={logo} alt="Logo" className="h-16" />
+        <Image src={logo} alt="Logo Adote Patinhas" width={140} height={50} />
       </div>
 
       <div className="flex gap-6 justify-center items-center">
