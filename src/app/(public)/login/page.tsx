@@ -8,6 +8,7 @@ import { useTheme } from "@mui/material/styles";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 export default function LoginPage() {
   const theme = useTheme();
@@ -35,7 +36,12 @@ export default function LoginPage() {
     <>
       <div>
         <div className="flex flex-col justify-center items-center">
-          <img className="w-1/2" src="./logo-branca.svg" alt="Logo Adote Patinhas"/>
+          <Image
+            src="/logo-branca.svg"
+            alt="Logo Adote Patinhas"
+            width={350}
+            height={200}
+          />
           <p className="text-white text-2xl font-bold my-3">Faça seu login!</p>
         </div>
         <div className="flex flex-col gap-3 my-8">

@@ -4,9 +4,11 @@ import { useState } from "react";
 import { useTheme } from "@mui/material/styles";
 import { Avatar, Box, Button, Stack } from "@mui/material";
 import { AccountCircleOutlined, LogoutOutlined } from "@mui/icons-material";
+import { useRouter } from "next/navigation";
 
 export default function HeaderMenu() {
   const theme = useTheme();
+  const router = useRouter();
   const [open, setOpen] = useState(false);
 
   const toggleMenu = () => setOpen(!open);
@@ -55,7 +57,9 @@ export default function HeaderMenu() {
               }}
               startIcon={<LogoutOutlined />}
             >
-              <p className="font-bold">Sair</p>
+              <p 
+              onClick={() => router.push("/login")}
+              className="font-bold">Sair</p>
             </Button>
           </Stack>
         </Box>

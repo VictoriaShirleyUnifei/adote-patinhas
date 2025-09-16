@@ -8,6 +8,7 @@ import { useTheme } from "@mui/material/styles";
 import { useRouter } from "next/navigation";
 import React from "react";
 import { useForm } from "react-hook-form";
+import Image from "next/image";
 
 export default function RegisterPage() {
   const theme = useTheme();
@@ -34,11 +35,12 @@ export default function RegisterPage() {
   return (
     <div>
       <div className="flex flex-col justify-center items-center">
-        <img
-          className="w-1/2"
-          src="./logo-branca.svg"
+        <Image
+          src="/logo-branca.svg"
           alt="Logo Adote Patinhas"
-        />
+          width={300}
+          height={150}
+        />  
         <p className="text-white text-2xl font-bold my-3">Faça seu cadastro!</p>
       </div>
       <div className="flex flex-col gap-3 my-8">
