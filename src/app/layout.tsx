@@ -26,7 +26,6 @@ export default function RootLayout({
         className={`${quicksand.variable} antialiased`}
       >
         <ThemeModeProvider>
-          <Header />
           <main>{children}</main>
         </ThemeModeProvider>
       </body>
