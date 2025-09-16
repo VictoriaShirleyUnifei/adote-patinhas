@@ -66,6 +66,7 @@ export default function LoginPage() {
           />
           <CustomButton
             textButton="Cadastrar"
+            onClick={() => router.push("/register")}
             backgroundColor={theme.palette.secondary.main}
           />
         </div>
