@@ -49,6 +49,8 @@ export default function LoginPage() {
             label="E-mail"
             placeholder="nome@gmail.com"
             type="email"
+            backgroundColor="#F1F3F6"
+            borderColor="#F1F3F6"
             {...register("email")}
           />
           {errors.email && (
@@ -58,6 +60,8 @@ export default function LoginPage() {
             label="Senha"
             placeholder="******"
             type="password"
+            backgroundColor="#F1F3F6"
+            borderColor="#F1F3F6"
             {...register("senha")}
           />
           {errors.senha && (
