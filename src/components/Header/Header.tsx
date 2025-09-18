@@ -1,7 +1,7 @@
 "use client";
 
 import { useTheme } from "@mui/material/styles";
-import ButtonTheme from "../ButtonTheme";
+import ButtonTheme from "../Buttons/ButtonTheme";
 import HeaderMenu from "./HeaderMenu";
 import Image from "next/image";
 
