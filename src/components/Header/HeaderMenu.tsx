@@ -25,7 +25,7 @@ export default function HeaderMenu() {
 
       {open && (
         <Box
-          className="absolute right-0 mt-2 p-2 shadow-lg rounded-md"
+          className="fixed right-20 mt-2 p-2 shadow-lg rounded-md z-50"
           sx={{
             backgroundColor: theme.palette.background.paper,
             minWidth: 180,
@@ -48,7 +48,7 @@ export default function HeaderMenu() {
 
             <Button
               variant="text"
-              onClick={() => console.log("Sair")}
+              onClick={() => router.push("/login")}
               sx={{
                 color: theme.palette.secondary.main,
                 justifyContent: "flex-start",
@@ -58,7 +58,6 @@ export default function HeaderMenu() {
               startIcon={<LogoutOutlined />}
             >
               <p 
-              onClick={() => router.push("/login")}
               className="font-bold">Sair</p>
             </Button>
           </Stack>

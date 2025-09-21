@@ -14,8 +14,8 @@ export default function PublicLayout({
   return (
     <div className="flex min-h-screen">
       {/* Imagem */}
-      <div className="relative w-1/2 hidden md:block h-screen">
-        <Image
+      <div className="relative w-1/2 hidden md:block">
+         <Image
           src="/imagem-telas-externas.png"
           alt="Imagem de fundo"
           fill
@@ -37,7 +37,7 @@ export default function PublicLayout({
               fontWeight="bold"
               sx={{
                 textTransform: "uppercase",
-                fontSize: { xs: "1.5rem", sm: "2rem", md: "2.5rem" },
+                fontSize: { sm: "1.5rem", md: "2.5rem" },
               }}
             >
               Adoção é um ato de amor!
@@ -47,7 +47,7 @@ export default function PublicLayout({
               fontWeight="bold"
               sx={{
                 textTransform: "uppercase",
-                fontSize: { xs: "1.2rem", sm: "1.5rem", md: "2rem" },
+                fontSize: { sm: "1rem", md: "2rem" },
               }}
             >
               Não compre, adote!
@@ -58,7 +58,7 @@ export default function PublicLayout({
 
       {/* Conteúdo */}
       <div
-        className="flex-1 flex justify-center items-center px-20 overflow-auto"
+        className="flex-1 flex justify-center items-center px-5 md:px-10 lg:px-20 overflow-auto"
         style={{ backgroundColor: theme.palette.primary.main }}
       >
         <div className="w-full max-w-2xl">{children}</div>
