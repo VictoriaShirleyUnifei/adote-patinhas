@@ -12,7 +12,7 @@ export default function CustomInput({
   label,
   placeholder,
   type = "text",
-  color,
+  color = "black",
   labelColor = "white",
   backgroundColor,
   borderColor,
