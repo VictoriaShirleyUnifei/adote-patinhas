@@ -14,8 +14,8 @@ export default function PublicLayout({
   return (
     <div className="flex min-h-screen">
       {/* Imagem */}
-      <div className="relative w-1/2 hidden md:block h-screen">
-        <Image
+      <div className="relative w-1/2 hidden md:block">
+         <Image
           src="/imagem-telas-externas.png"
           alt="Imagem de fundo"
           fill
