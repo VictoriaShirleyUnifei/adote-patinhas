@@ -26,18 +26,21 @@ export default function CardAnimal() {
           paddingY: "12px",
           borderRadius: "8px",
           backgroundColor: theme.palette.card.default,
-          width: {
-            xs: "100%",  
-            sm: "50%",   
-            md: "30%",   
-            lg: "20%",
+          flexBasis: {
+            xs: "100%",   
+            sm: "40%",    
+            md: "33.33%", 
+            lg: "25%",    
           },
-          height: "auto",
+          flexGrow: 1,
+          flexShrink: 0,
+          padding: "12px",
+          maxHeight: "fit-content", 
         }}
       >
         <div className="flex justify-between">
           <p
-            className="font-medium"
+            className="font-semibold"
             style={{ color: theme.palette.text.primary }}
           >
             Frajola
@@ -45,7 +48,7 @@ export default function CardAnimal() {
           <div className="flex">
             <PlaceOutlined />
             <p
-              className="font-medium"
+              className="font-semibold"
               style={{ color: theme.palette.text.primary }}
             >
               10km
@@ -63,33 +66,33 @@ export default function CardAnimal() {
         <div>
           <div className="flex gap-1">
             <p
-              className="font-medium"
+              className="font-semibold"
               style={{ color: theme.palette.text.primary }}
             >
               Idade:
             </p>
-            <p style={{ color: theme.palette.text.secondary }}>
+            <p className="font-semibold" style={{ color: theme.palette.text.secondary }}>
               1 ano e 2 meses
             </p>
           </div>
           <div className="flex justify-between">
             <div className="flex gap-1">
               <p
-                className="font-medium"
+                className="font-semibold"
                 style={{ color: theme.palette.text.primary }}
               >
                 Sexo:
               </p>
-              <p style={{ color: theme.palette.text.secondary }}>Macho</p>
+              <p className="font-semibold" style={{ color: theme.palette.text.secondary }}>Macho</p>
             </div>
             <div className="flex gap-1">
               <p
-                className="font-medium"
+                className="font-semibold"
                 style={{ color: theme.palette.text.primary }}
               >
                 Porte:
               </p>
-              <p style={{ color: theme.palette.text.secondary }}>Pequeno</p>
+              <p className="font-semibold" style={{ color: theme.palette.text.secondary }}>Pequeno</p>
             </div>
           </div>
         </div>
@@ -102,7 +105,7 @@ export default function CardAnimal() {
         />
 
         <div
-          className="flex justify-center items-center text-sm font-medium cursor-pointer"
+          className="flex justify-center items-center text-sm font-semibold cursor-pointer"
           style={{ color: theme.palette.text.primary }}
           onClick={() => setOpenModal(true)}
         >
