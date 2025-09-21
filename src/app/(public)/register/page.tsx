@@ -47,6 +47,8 @@ export default function RegisterPage() {
         <CustomInput
           label="Nome"
           placeholder="Seu nome completo"
+          backgroundColor="#F1F3F6"
+          borderColor="#F1F3F6"
           {...register("name")}
         />
         {errors.name && (
@@ -56,6 +58,8 @@ export default function RegisterPage() {
           label="E-mail"
           placeholder="nome@gmail.com"
           type="email"
+          backgroundColor="#F1F3F6"
+          borderColor="#F1F3F6"
           {...register("email")}
         />
         {errors.email && (
@@ -65,6 +69,8 @@ export default function RegisterPage() {
           label="Senha"
           placeholder="******"
           type="password"
+          backgroundColor="#F1F3F6"
+          borderColor="#F1F3F6"
           {...register("password")}
         />
         {errors.password && (
@@ -74,6 +80,8 @@ export default function RegisterPage() {
           label="Confirmar senha"
           placeholder="******"
           type="password"
+          backgroundColor="#F1F3F6"
+          borderColor="#F1F3F6"
           {...register("confirmPassword")}
         />
         {errors.confirmPassword && (
