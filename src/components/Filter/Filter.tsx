@@ -19,12 +19,11 @@ export default function Filter() {
         padding: "16px",
         borderRadius: "8px",
         backgroundColor: theme.palette.card.default,
-        width: "30%",
         height: "auto",
       }}
     >
       <p
-        className="font-bold mb-3 text-1xl"
+        className="font-bold text-1xl"
         style={{ color: theme.palette.secondary.main }}
       >
         Filtros de busca:
