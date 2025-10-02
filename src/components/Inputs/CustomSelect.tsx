@@ -9,6 +9,8 @@ type CustomSelectProps = {
   labelColor?: string;
   backgroundColor?: string;
   borderColor?: string;
+  style?: React.CSSProperties;
+  className?: string;
 };
 
 export default function CustomSelect({
@@ -20,10 +22,12 @@ export default function CustomSelect({
   labelColor = "white",
   backgroundColor,
   borderColor,
+  style,
+  className = "",
   ...selectProps
 }: CustomSelectProps) {
   return (
-    <div className="flex flex-col space-y-2">
+    <div className={`flex flex-col space-y-2 ${className}`}>
       {label && (
         <label style={{ color: labelColor }} className="font-medium">
           {label}
@@ -39,6 +43,7 @@ export default function CustomSelect({
             color: color,
             backgroundColor: backgroundColor,
             borderColor: borderColor,
+            ...style,
           }}
           className="w-full border rounded-lg py-2 px-4 focus:outline-none appearance-none pr-10" // pr-10 para espaço do ícone
           {...selectProps}
@@ -52,7 +57,8 @@ export default function CustomSelect({
         
         {/* Ícone personalizado */}
         <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-          <ArrowDropDown 
+          <ArrowDropDown
+            style={{ color: color }} 
             className="w-5 h-5"
           />
         </div>
