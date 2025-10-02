@@ -163,7 +163,7 @@ export default function ModalViewAnimal({
             textButton="Tenho interesse"
             backgroundColor={theme.palette.secondary.main}
             fullWidth={false}
-            sx={{ width: { xs: "100%", md: 300 }, height: 40 }}
+            sx={{ width: { xs: "100%", md: 320 }, height: 40 }}
           />
         </section>
       </Box>
