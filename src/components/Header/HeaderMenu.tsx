@@ -34,7 +34,7 @@ export default function HeaderMenu() {
           <Stack spacing={1}>
             <Button
               variant="text"
-              onClick={() => console.log("Perfil")}
+              onClick={() => router.push("/profile")}
               sx={{
                 color: theme.palette.secondary.main,
                 justifyContent: "flex-start",
