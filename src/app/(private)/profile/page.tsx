@@ -1,8 +1,8 @@
 "use client";
 
 import CardAnimal from "@/components/Cards/CardAnimal";
+import CardPersonalInfos from "@/components/Cards/CardPersonalInfos";
 import Filter from "@/components/Filter/Filter";
-import ModalRegisterAnimal from "@/components/Modals/ModalRegisterAnimal";
 import { ArrowRight } from "@mui/icons-material";
 import { Box, Button, Stack, Typography } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
@@ -10,29 +10,13 @@ import React from "react";
 
 export default function ProfilePage() {
   const theme = useTheme();
-  const [openModal, setOpenModal] = React.useState(false);
-  const [viewProfile, setViewProfile] = React.useState(false);
-  const [viewRegisteredAnimals, setViewRegisteredAnimals] =
-    React.useState(false);
-  const [viewInterestList, setViewInterestList] = React.useState(false);
+  const [view, setView] = React.useState<"profile" | "animals" | "interests">(
+    "profile"
+  );
 
-  const handleViewProfile = () => {
-    setViewProfile(true);
-    setViewRegisteredAnimals(false);
-    setViewInterestList(false);
-  };
-
-  const handleViewRegisteredAnimals = () => {
-    setViewProfile(false);
-    setViewRegisteredAnimals(true);
-    setViewInterestList(false);
-  };
-
-  const handleViewInterestList = () => {
-    setViewProfile(false);
-    setViewRegisteredAnimals(false);
-    setViewInterestList(true);
-  };
+  const handleViewProfile = () => setView("profile");
+  const handleViewRegisteredAnimals = () => setView("animals");
+  const handleViewInterestList = () => setView("interests");
 
   const renderCards = (n: number) => {
     return Array.from({ length: n }).map((_, index) => (
@@ -100,58 +84,48 @@ export default function ProfilePage() {
           <Filter />
         </div>
 
-        {viewProfile && (
+        {view === "profile" && (
           <div className="flex flex-col gap-3 flex-1">
-            
+            <CardPersonalInfos />
           </div>
         )}
 
-        {viewRegisteredAnimals && (
+        {view === "animals" && (
           <div className="flex flex-col gap-3 flex-1">
-          <Box
-            sx={{
-              backgroundColor: theme.palette.card.default,
-              color: theme.palette.tertiary.main,
-              padding: "8px",
-              borderRadius: "8px",
-            }}
-          >
-            <p className="font-bold text-center px-6">
-              Animais cadastrados
-            </p>
-          </Box>
-          <div className="flex flex-wrap gap-3 flex-1 max-h-screen overflow-y-auto">
-            {renderCards(12)}
+            <Box
+              sx={{
+                backgroundColor: theme.palette.card.default,
+                color: theme.palette.tertiary.main,
+                padding: "8px",
+                borderRadius: "8px",
+              }}
+            >
+              <p className="font-bold text-center px-6">Animais cadastrados</p>
+            </Box>
+            <div className="flex flex-wrap gap-3 flex-1 max-h-screen overflow-y-auto">
+              {renderCards(12)}
+            </div>
           </div>
-        </div>
         )}
 
-        {viewInterestList && (
+        {view === "interests" && (
           <div className="flex flex-col gap-3 flex-1">
-          <Box
-            sx={{
-              backgroundColor: theme.palette.card.default,
-              color: theme.palette.tertiary.main,
-              padding: "8px",
-              borderRadius: "8px",
-            }}
-          >
-            <p className="font-bold text-center px-6">
-              Lista de interesses
-            </p>
-          </Box>
-          <div className="flex flex-wrap gap-3 flex-1 max-h-screen overflow-y-auto">
-            {renderCards(12)}
+            <Box
+              sx={{
+                backgroundColor: theme.palette.card.default,
+                color: theme.palette.tertiary.main,
+                padding: "8px",
+                borderRadius: "8px",
+              }}
+            >
+              <p className="font-bold text-center px-6">Lista de interesses</p>
+            </Box>
+            <div className="flex flex-wrap gap-3 flex-1 max-h-screen overflow-y-auto">
+              {renderCards(12)}
+            </div>
           </div>
-        </div>
         )}
-
       </div>
-
-      <ModalRegisterAnimal
-        open={openModal}
-        onClose={() => setOpenModal(false)}
-      />
     </>
   );
 }
