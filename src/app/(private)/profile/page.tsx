@@ -3,6 +3,7 @@
 import CardAnimal from "@/components/Cards/CardAnimal";
 import CardPersonalInfos from "@/components/Cards/CardPersonalInfos";
 import Filter from "@/components/Filter/Filter";
+import { mockAnimals } from "@/mocks/animal";
 import { ArrowRight } from "@mui/icons-material";
 import { Box, Button, Stack, Typography } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
@@ -13,14 +14,28 @@ export default function ProfilePage() {
   const [view, setView] = React.useState<"profile" | "animals" | "interests">(
     "profile"
   );
+  const [animals, setAnimals] = React.useState(mockAnimals);
+  
+  const handleInterestToggle = (animalId: string, interested: boolean) => {
+    setAnimals((prevAnimals) =>
+      prevAnimals.map((animal) =>
+        animal.id === animalId ? { ...animal, isInterested: interested } : animal
+      )
+    );
+  };
 
   const handleViewProfile = () => setView("profile");
   const handleViewRegisteredAnimals = () => setView("animals");
   const handleViewInterestList = () => setView("interests");
 
-  const renderCards = (n: number) => {
-    return Array.from({ length: n }).map((_, index) => (
-      <CardAnimal key={index} />
+  const renderCards = () => {
+    return animals.map((animal) => (
+      <CardAnimal 
+        key={animal.id}
+        animal={animal}
+        variant="default"
+        onInterestToggle={handleInterestToggle}
+      />
     ));
   };
 
@@ -103,7 +118,7 @@ export default function ProfilePage() {
               <p className="font-bold text-center px-6">Animais cadastrados</p>
             </Box>
             <div className="flex flex-wrap gap-3 flex-1 max-h-screen overflow-y-auto">
-              {renderCards(12)}
+              {renderCards()}
             </div>
           </div>
         )}
@@ -121,7 +136,7 @@ export default function ProfilePage() {
               <p className="font-bold text-center px-6">Lista de interesses</p>
             </Box>
             <div className="flex flex-wrap gap-3 flex-1 max-h-screen overflow-y-auto">
-              {renderCards(12)}
+              {renderCards()}
             </div>
           </div>
         )}
