@@ -8,6 +8,10 @@ import Image from "next/image";
 export default function Header() {
   const theme = useTheme();
 
+  const routeToHome = () => {
+    window.location.href = "/home";
+  }
+
   const logo =
     theme.palette.mode === "light"
       ? "/logo-marrom.svg" // logo para modo claro
@@ -20,7 +24,7 @@ export default function Header() {
         backgroundColor: theme.palette.background.paper,
       }}
     >
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 cursor-pointer" onClick={routeToHome}>
         <Image src={logo} alt="Logo Adote Patinhas" width={140} height={50} />
       </div>
 
