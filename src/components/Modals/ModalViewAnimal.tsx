@@ -6,17 +6,90 @@ import React from "react";
 import CustomButton from "../Buttons/CustomButton";
 import { Close, LocationOnOutlined } from "@mui/icons-material";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { Animal } from "../../types/animal";
 
-type ModalViewAnimalProps = {
+interface ModalViewAnimalProps {
   open: boolean;
   onClose: () => void;
-};
+  animal: Animal;
+  variant?: "default" | "interested" | "myPets";
+  onInterestToggle?: (animalId: string, interested: boolean) => void;
+  onAdopt?: (animalId: string) => void;
+}
 
 export default function ModalViewAnimal({
   open,
   onClose,
+  animal,
+  variant = "default",
+  onInterestToggle,
+  onAdopt
 }: ModalViewAnimalProps) {
   const theme = useTheme();
+  const router = useRouter();
+
+  const handleInterestClick = () => {
+    if (onInterestToggle) {
+      const newInterestState = !animal.isInterested;
+      onInterestToggle(animal.id, newInterestState);
+      
+      // Se marcou interesse, redireciona para o perfil
+      if (newInterestState && variant === "default") {
+        router.push("/perfil?tab=interesses");
+      }
+    }
+  };
+
+  const handleAdoptClick = () => {
+    if (onAdopt) {
+      onAdopt(animal.id);
+      onClose();
+    }
+  };
+
+  const getButtonConfig = () => {
+    switch (variant) {
+      case "interested":
+        return {
+          text: "Remover interesse",
+          backgroundColor: theme.palette.error.main,
+          onClick: handleInterestClick
+        };
+      case "myPets":
+        return {
+          text: "Marcar como adotado",
+          backgroundColor: theme.palette.success.main,
+          onClick: handleAdoptClick
+        };
+      default:
+        return {
+          text: animal.isInterested ? "Remover interesse" : "Tenho interesse",
+          backgroundColor: animal.isInterested 
+            ? theme.palette.error.main 
+            : theme.palette.secondary.main,
+          onClick: handleInterestClick
+        };
+    }
+  };
+
+  const buttonConfig = getButtonConfig();
+
+  // Status do animal (vacinado, castrado, etc.)
+  const animalStatus = [
+    animal.vaccinated && "Vacinado",
+    animal.castrated && "Castrado",
+    animal.dewormed && "Vermifugado"
+  ].filter(Boolean).join(" | ");
+
+  // Características comportamentais
+  const behavioralTraits = [
+    animal.getsAlongWithAnimals && "Se dá bem com outros animais",
+    animal.getsAlongWithChildren && "Se dá bem com crianças",
+    animal.needsSpecialCare && "Necessita cuidados especiais",
+    animal.isElderly && "Animal idoso",
+    animal.hasDisability && "Animal com deficiência"
+  ].filter(Boolean);
 
   return (
     <Modal open={open} onClose={onClose}>
@@ -41,38 +114,41 @@ export default function ModalViewAnimal({
           p: 2
         }}
       >
-        {/* --- Conteúdo principal --- */}
+        {/* Conteúdo do modal (mantenha igual ao anterior) */}
         <section className="grid grid-cols-1 md:grid-cols-[1fr_2fr] gap-4">
           <div>
-            {/* --- Close responsivo --- */}
             <div className="flex justify-end cursor-pointer md:hidden" onClick={onClose}>
               <Close />
             </div>
 
-            {/* --- Imagem e nome --- */}
             <div className="hidden md:flex md:justify-between">
-              <p className="font-semibold">Frajola</p>
-              <div className="flex items-center gap-1">
-                <LocationOnOutlined />
-                <p className="font-semibold">10km</p>
-              </div>
+              <p className="font-semibold">{animal.name}</p>
+              {animal.distance && (
+                <div className="flex items-center gap-1">
+                  <LocationOnOutlined />
+                  <p className="font-semibold">{animal.distance}</p>
+                </div>
+              )}
             </div>
+            
             <div className="relative w-full h-64">
               <Image
-                src="/imagem-exemplo-card.png"
-                alt="Foto de Gatinho"
+                src={animal.image}
+                alt={`Foto de ${animal.name}`}
                 fill
                 className="object-cover rounded-lg mt-2"
+                priority
               />
             </div>
 
-            {/* --- Imagem e nome responsivo --- */}
             <div className="flex justify-between mt-4 md:hidden">
-              <p className="font-semibold">Frajola</p>
-              <div className="flex items-center gap-1">
-                <LocationOnOutlined />
-                <p className="font-semibold">10km</p>
-              </div>
+              <p className="font-semibold">{animal.name}</p>
+              {animal.distance && (
+                <div className="flex items-center gap-1">
+                  <LocationOnOutlined />
+                  <p className="font-semibold">{animal.distance}</p>
+                </div>
+              )}
             </div>
           </div>
 
@@ -82,87 +158,95 @@ export default function ModalViewAnimal({
             </div>
             <p>Descrição:</p>
             <p style={{ color: theme.palette.text.secondary }}>
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Obcaecati
-              vitae eligendi quo voluptates, similique, quis ratione earum,
-              numquam tempora atque consequatur corporis fuga at itaque!
-              Temporibus autem amet voluptatem id.
+              {animal.description || "Descrição não disponível."}
             </p>
-            <p className="block font-semibold mt-3 md:hidden">Vacinado | Castrado | Vermifugado</p>
+            {animalStatus && (
+              <p className="block font-semibold mt-3 md:hidden">{animalStatus}</p>
+            )}
           </div>
         </section>
 
-        {/* --- Informações adicionais --- */}
         <section className="grid grid-cols-1 md:grid-cols-[1fr_2fr] gap-4 mt-4 font-semibold">
           <div>
             <div className="flex gap-2">
               <p>Idade:</p>
               <p style={{ color: theme.palette.text.secondary }}>
-                1 ano e 2 meses
+                {animal.age}
               </p>
             </div>
             <div className="grid grid-cols-2 gap-y-2">
               <div className="flex gap-2">
                 <p>Sexo:</p>
-                <p style={{ color: theme.palette.text.secondary }}>Macho</p>
+                <p style={{ color: theme.palette.text.secondary }}>{animal.sex}</p>
               </div>
               <div className="flex gap-2">
                 <p>Porte:</p>
-                <p style={{ color: theme.palette.text.secondary }}>Médio</p>
+                <p style={{ color: theme.palette.text.secondary }}>{animal.size}</p>
               </div>
               <div className="flex gap-2">
                 <p>Espécie:</p>
-                <p style={{ color: theme.palette.text.secondary }}>Felina</p>
+                <p style={{ color: theme.palette.text.secondary }}>
+                  {animal.species || "Não informado"}
+                </p>
               </div>
               <div className="flex gap-2">
                 <p>Raça:</p>
-                <p style={{ color: theme.palette.text.secondary }}>SRD</p>
+                <p style={{ color: theme.palette.text.secondary }}>
+                  {animal.breed || "Não informado"}
+                </p>
               </div>
             </div>
           </div>
 
           <div>
-            <p className="hidden md:block">Vacinado | Castrado | Vermifugado</p>
-            <div className="flex flex-col text-center md:grid md:grid-cols-2 md:gap-y-2 md:text-start">
-              <div>
-                <p>Se dá bem com outros animais</p>
-                <p>Se dá bem com crianças</p>
+            {animalStatus && (
+              <p className="hidden md:block">{animalStatus}</p>
+            )}
+            {behavioralTraits.length > 0 && (
+              <div className="flex flex-col text-center md:grid md:grid-cols-2 md:gap-y-2 md:text-start mt-2 md:mt-0">
+                <div>
+                  {behavioralTraits.slice(0, Math.ceil(behavioralTraits.length / 2)).map((trait, index) => (
+                    <p key={index}>{trait}</p>
+                  ))}
+                </div>
+                <div>
+                  {behavioralTraits.slice(Math.ceil(behavioralTraits.length / 2)).map((trait, index) => (
+                    <p key={index}>{trait}</p>
+                  ))}
+                </div>
               </div>
-              <div>
-                <p>Necessita cuidados especiais</p>
-                <p>Animal idoso</p>
-                <p>Animal com deficiência</p>
-              </div>
-            </div>
+            )}
           </div>
         </section>
 
-        {/* --- Tutor e botão --- */}
         <section className="flex flex-col md:flex-row justify-between items-center pt-4 font-semibold text-sm gap-4">
-          <div className="flex gap-4 items-center">
-            <Avatar
-              src="/imagem-exemplo-foto-de-perfil.jpg"
-              alt="Foto de perfil"
-              sx={{ width: 60, height: 60, cursor: "pointer" }}
-            />
-            <div>
-              <p>Maria Rita de Lima</p>
-              <p style={{ color: theme.palette.text.secondary }}>
-                (35) 99999-9999
-              </p>
-              <div
-                className="flex text-[10px] gap-1"
-                style={{ color: theme.palette.secondary.main }}
-              >
-                <p>Data da publicação:</p>
-                <p>12/04/2024</p>
+          {animal.tutor && (
+            <div className="flex gap-4 items-center">
+              <Avatar
+                src={animal.tutor.avatar || "/default-avatar.png"}
+                alt={`Foto de ${animal.tutor.name}`}
+                sx={{ width: 60, height: 60, cursor: "pointer" }}
+              />
+              <div>
+                <p>{animal.tutor.name}</p>
+                <p style={{ color: theme.palette.text.secondary }}>
+                  {animal.tutor.phone}
+                </p>
+                {animal.publicationDate && (
+                  <div className="flex text-[10px] gap-1" style={{ color: theme.palette.secondary.main }}>
+                    <p>Data da publicação:</p>
+                    <p>{animal.publicationDate}</p>
+                  </div>
+                )}
               </div>
             </div>
-          </div>
+          )}
 
           <CustomButton
-            textButton="Tenho interesse"
-            backgroundColor={theme.palette.secondary.main}
+            textButton={buttonConfig.text}
+            backgroundColor={buttonConfig.backgroundColor}
             fullWidth={false}
+            onClick={buttonConfig.onClick}
             sx={{ width: { xs: "100%", md: 320 }, height: 40 }}
           />
         </section>

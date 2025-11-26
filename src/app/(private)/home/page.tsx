@@ -4,6 +4,7 @@ import CustomButton from "@/components/Buttons/CustomButton";
 import CardAnimal from "@/components/Cards/CardAnimal";
 import Filter from "@/components/Filter/Filter";
 import ModalRegisterAnimal from "@/components/Modals/ModalRegisterAnimal";
+import { mockAnimals } from "@/mocks/animal";
 import { PetsOutlined } from "@mui/icons-material";
 import { Card } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
@@ -12,12 +13,28 @@ import React from "react";
 export default function HomePage() {
   const theme = useTheme();
   const [openModal, setOpenModal] = React.useState(false);
+  const [animals, setAnimals] = React.useState(mockAnimals);
 
-  const renderCards = (n: number) => {
-    return Array.from({ length: n }).map((_, index) => (
-      <CardAnimal key={index} />
+  const handleInterestToggle = (animalId: string, interested: boolean) => {
+    setAnimals((prevAnimals) =>
+      prevAnimals.map((animal) =>
+        animal.id === animalId ? { ...animal, isInterested: interested } : animal
+      )
+    );
+  };
+
+  const renderCards = () => {
+    return animals.map((animal) => (
+      <CardAnimal 
+        key={animal.id}
+        animal={animal}
+        variant="default"
+        onInterestToggle={handleInterestToggle}
+      />
     ));
   };
+
+  
 
   return (
     <>
@@ -47,7 +64,7 @@ export default function HomePage() {
           <Filter />
         </div>
         <div className="flex flex-wrap gap-3 flex-1 max-h-screen overflow-y-auto">
-          {renderCards(12)}
+          {renderCards()}
         </div>
       </div>
 
