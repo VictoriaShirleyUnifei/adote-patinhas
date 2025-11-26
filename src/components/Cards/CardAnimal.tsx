@@ -10,10 +10,63 @@ import React from "react";
 import Image from "next/image";
 import CustomButton from "../Buttons/CustomButton";
 import ModalViewAnimal from "../Modals/ModalViewAnimal";
+import { Animal } from "@/types/animal";
+interface CardAnimalProps {
+  animal: Animal;
+  variant?: "default" | "interested" | "myPets";
+  onInterestToggle?: (animalId: string, interested: boolean) => void;
+  onAdopt?: (animalId: string) => void;
+  showInterestButton?: boolean;
+}
 
-export default function CardAnimal() {
+export default function CardAnimal({ 
+  animal, 
+  variant = "default",
+  onInterestToggle,
+  onAdopt,
+  showInterestButton = true 
+}: CardAnimalProps) {
   const theme = useTheme();
   const [openModal, setOpenModal] = React.useState(false);
+
+  const handleInterestClick = () => {
+    if (onInterestToggle) {
+      onInterestToggle(animal.id, !animal.isInterested);
+    }
+  };
+
+  const handleAdoptClick = () => {
+    if (onAdopt) {
+      onAdopt(animal.id);
+    }
+  };
+
+  const getButtonConfig = () => {
+    switch (variant) {
+      case "interested":
+        return {
+          text: "Remover interesse",
+          backgroundColor: theme.palette.error.main,
+          onClick: handleInterestClick
+        };
+      case "myPets":
+        return {
+          text: "Marcar como adotado",
+          backgroundColor: theme.palette.success.main,
+          onClick: handleAdoptClick
+        };
+      default:
+        return {
+          text: animal.isInterested ? "Remover interesse" : "Tenho interesse",
+          backgroundColor: animal.isInterested 
+            ? theme.palette.error.main 
+            : theme.palette.secondary.main,
+          onClick: handleInterestClick
+        };
+    }
+  };
+
+  const buttonConfig = getButtonConfig();
 
   return (
     <>
@@ -39,70 +92,66 @@ export default function CardAnimal() {
         }}
       >
         <div className="flex justify-between">
-          <p
-            className="font-semibold"
-            style={{ color: theme.palette.text.primary }}
-          >
-            Frajola
+          <p className="font-semibold" style={{ color: theme.palette.text.primary }}>
+            {animal.name}
           </p>
-          <div className="flex">
-            <PlaceOutlined />
-            <p
-              className="font-semibold"
-              style={{ color: theme.palette.text.primary }}
-            >
-              10km
-            </p>
-          </div>
+          {animal.distance && (
+            <div className="flex">
+              <PlaceOutlined />
+              <p className="font-semibold" style={{ color: theme.palette.text.primary }}>
+                {animal.distance}
+              </p>
+            </div>
+          )}
         </div>
+        
         <div className="relative w-full h-60">
           <Image
-            src="/imagem-exemplo-card.png"
-            alt="Foto de um gato"
+            src={animal.image}
+            alt={`Foto de ${animal.name}`}
             fill
             className="rounded-lg object-cover"
           />
         </div>
+        
         <div>
           <div className="flex gap-1">
-            <p
-              className="font-semibold"
-              style={{ color: theme.palette.text.primary }}
-            >
+            <p className="font-semibold" style={{ color: theme.palette.text.primary }}>
               Idade:
             </p>
             <p className="font-semibold" style={{ color: theme.palette.text.secondary }}>
-              1 ano e 2 meses
+              {animal.age}
             </p>
           </div>
           <div className="flex justify-between">
             <div className="flex gap-1">
-              <p
-                className="font-semibold"
-                style={{ color: theme.palette.text.primary }}
-              >
+              <p className="font-semibold" style={{ color: theme.palette.text.primary }}>
                 Sexo:
               </p>
-              <p className="font-semibold" style={{ color: theme.palette.text.secondary }}>Macho</p>
+              <p className="font-semibold" style={{ color: theme.palette.text.secondary }}>
+                {animal.sex}
+              </p>
             </div>
             <div className="flex gap-1">
-              <p
-                className="font-semibold"
-                style={{ color: theme.palette.text.primary }}
-              >
+              <p className="font-semibold" style={{ color: theme.palette.text.primary }}>
                 Porte:
               </p>
-              <p className="font-semibold" style={{ color: theme.palette.text.secondary }}>Pequeno</p>
+              <p className="font-semibold" style={{ color: theme.palette.text.secondary }}>
+                {animal.size}
+              </p>
             </div>
           </div>
         </div>
 
-        <CustomButton
-          textButton="Tenho interesse"
-          backgroundColor={theme.palette.secondary.main}
-          color={theme.palette.text.primary}
-          fullWidth
-        />
+        {showInterestButton && (
+          <CustomButton
+            textButton={buttonConfig.text}
+            backgroundColor={buttonConfig.backgroundColor}
+            color={theme.palette.text.primary}
+            fullWidth
+            onClick={buttonConfig.onClick}
+          />
+        )}
 
         <div
           className="flex justify-center items-center text-sm font-semibold cursor-pointer"
@@ -114,7 +163,14 @@ export default function CardAnimal() {
         </div>
       </Box>
 
-      <ModalViewAnimal open={openModal} onClose={() => setOpenModal(false)} />
+      <ModalViewAnimal 
+        open={openModal} 
+        onClose={() => setOpenModal(false)}
+        animal={animal}
+        variant={variant}
+        onInterestToggle={onInterestToggle}
+        onAdopt={onAdopt}
+      />
     </>
   );
 }
