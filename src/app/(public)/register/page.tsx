@@ -9,10 +9,12 @@ import { useRouter } from "next/navigation";
 import React from "react";
 import { useForm } from "react-hook-form";
 import Image from "next/image";
+import { useToast } from "@/context/ToastContext";
 
 export default function RegisterPage() {
   const theme = useTheme();
   const router = useRouter();
+  const { showSuccess, showError } = useToast();
 
   const {
     register,
@@ -22,13 +24,25 @@ export default function RegisterPage() {
     resolver: zodResolver(registerSchema),
   });
 
-  const onSubmit = (data: RegisterData) => {
-    console.log("Register:", data);
+  const onSubmit = async (data: RegisterData) => {
+    try {
+      const res = await fetch("/api/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
 
-    const registerOk = true;
+      const result = await res.json();
 
-    if (registerOk) {
+      if (!res.ok) {
+       showError(result.error || "Erro ao cadastrar");
+        return;
+      }
+
+      showSuccess("Cadastro realizado com sucesso!");
       router.push("/login");
+    } catch (err) {
+      showError("Erro inesperado no servidor!");
     }
   };
 
@@ -40,7 +54,7 @@ export default function RegisterPage() {
           alt="Logo Adote Patinhas"
           width={300}
           height={150}
-        />  
+        />
         <p className="text-white text-2xl font-bold my-3">Faça seu cadastro!</p>
       </div>
       <div className="flex flex-col gap-3 my-8">
@@ -49,10 +63,10 @@ export default function RegisterPage() {
           placeholder="Seu nome completo"
           backgroundColor="#F1F3F6"
           borderColor="#F1F3F6"
-          {...register("name")}
+          {...register("nome")}
         />
-        {errors.name && (
-          <p className="text-red-500 text-sm">{errors.name.message}</p>
+        {errors.nome && (
+          <p className="text-red-500 text-sm">{errors.nome.message}</p>
         )}
         <CustomInput
           label="E-mail"
@@ -71,10 +85,10 @@ export default function RegisterPage() {
           type="password"
           backgroundColor="#F1F3F6"
           borderColor="#F1F3F6"
-          {...register("password")}
+          {...register("senha")}
         />
-        {errors.password && (
-          <p className="text-red-500 text-sm">{errors.password.message}</p>
+        {errors.senha && (
+          <p className="text-red-500 text-sm">{errors.senha.message}</p>
         )}
         <CustomInput
           label="Confirmar senha"
@@ -82,10 +96,12 @@ export default function RegisterPage() {
           type="password"
           backgroundColor="#F1F3F6"
           borderColor="#F1F3F6"
-          {...register("confirmPassword")}
+          {...register("confirmaSenha")}
         />
-        {errors.confirmPassword && (
-          <p className="text-red-500 text-sm">{errors.confirmPassword.message}</p>
+        {errors.confirmaSenha && (
+          <p className="text-red-500 text-sm">
+            {errors.confirmaSenha.message}
+          </p>
         )}
       </div>
       <div className="flex flex-col gap-4 my-6">
