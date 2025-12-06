@@ -93,7 +93,7 @@ export default function CardAnimal({
       >
         <div className="flex justify-between">
           <p className="font-semibold" style={{ color: theme.palette.text.primary }}>
-            {animal.name}
+            {animal.nome}
           </p>
           {animal.distance && (
             <div className="flex">
@@ -107,8 +107,8 @@ export default function CardAnimal({
         
         <div className="relative w-full h-60">
           <Image
-            src={animal.image}
-            alt={`Foto de ${animal.name}`}
+            src={`/uploads/${animal.foto}`}
+            alt={`Foto de ${animal.nome}`}
             fill
             className="rounded-lg object-cover"
           />
@@ -120,7 +120,7 @@ export default function CardAnimal({
               Idade:
             </p>
             <p className="font-semibold" style={{ color: theme.palette.text.secondary }}>
-              {animal.age}
+              {animal.dataNascimento}
             </p>
           </div>
           <div className="flex justify-between">
@@ -129,7 +129,7 @@ export default function CardAnimal({
                 Sexo:
               </p>
               <p className="font-semibold" style={{ color: theme.palette.text.secondary }}>
-                {animal.sex}
+                {animal.sexo}
               </p>
             </div>
             <div className="flex gap-1">
@@ -137,7 +137,7 @@ export default function CardAnimal({
                 Porte:
               </p>
               <p className="font-semibold" style={{ color: theme.palette.text.secondary }}>
-                {animal.size}
+                {animal.porte}
               </p>
             </div>
           </div>
