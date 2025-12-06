@@ -12,7 +12,7 @@ import CustomButton from "../Buttons/CustomButton";
 import ModalViewAnimal from "../Modals/ModalViewAnimal";
 import { Animal } from "@/types/animal";
 import { formatAgeFromDate } from "@/utils/formatAge";
-import { capitalize } from "@/utils/captalize";
+import { capitalize } from "@/utils/capitalize";
 interface CardAnimalProps {
   animal: Animal;
   variant?: "default" | "interested" | "myPets";

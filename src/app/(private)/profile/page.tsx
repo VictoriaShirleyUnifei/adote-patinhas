@@ -110,7 +110,7 @@ export default function ProfilePage() {
               </Button>
             </Stack>
           </Box>
-          <Filter />
+          {/* <Filter /> */}
         </div>
 
         {view === "profile" && (
