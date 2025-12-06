@@ -3,7 +3,7 @@
 import CardAnimal from "@/components/Cards/CardAnimal";
 import CardPersonalInfos from "@/components/Cards/CardPersonalInfos";
 import Filter from "@/components/Filter/Filter";
-import { mockAnimals } from "@/mocks/animal";
+import { Animal } from "@/types/animal";
 import { ArrowRight } from "@mui/icons-material";
 import { Box, Button, Stack, Typography } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
@@ -14,7 +14,21 @@ export default function ProfilePage() {
   const [view, setView] = React.useState<"profile" | "animals" | "interests">(
     "profile"
   );
-  const [animals, setAnimals] = React.useState(mockAnimals);
+ const [animals, setAnimals] = React.useState<Animal[]>([]);
+
+ React.useEffect(() => {
+  async function fetchAnimals() {
+    try {
+      const response = await fetch("/api/animals", { cache: "no-store" });
+      const data = await response.json();
+      setAnimals(data);
+    } catch (error) {
+      console.error("Erro ao carregar animais", error);
+    }
+  }
+
+  fetchAnimals();
+}, []);
   
   const handleInterestToggle = (animalId: string, interested: boolean) => {
     setAnimals((prevAnimals) =>
