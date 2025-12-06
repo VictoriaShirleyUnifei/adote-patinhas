@@ -1,0 +1,80 @@
+[
+  {
+    "id": "435b32ea-0d78-498d-a19b-540d11ab96a8",
+    "foto": "1765039836602-gato-filhote.jpg",
+    "isInterested": false,
+    "nome": "Gigi",
+    "especie": "gato",
+    "descricao": "Teste",
+    "dataNascimento": "2001-12-03",
+    "sexo": "macho",
+    "porte": "pequeno",
+    "raca": "SRD",
+    "saude": {
+      "vacinado": true,
+      "vermifugado": true,
+      "castrado": true
+    },
+    "convivencia": {
+      "outrosAnimais": true,
+      "criancas": true
+    },
+    "condicoes": {
+      "cuidadosEspeciais": true,
+      "idoso": true,
+      "deficiencia": true
+    }
+  },
+  {
+    "id": "7c97c189-45b0-4535-8ffa-1a655c6baa5a",
+    "foto": "1765040912059-cachorro-filhote.jpg",
+    "isInterested": false,
+    "nome": "Toninho",
+    "especie": "cachorro",
+    "descricao": "Teste",
+    "dataNascimento": "2001-12-03",
+    "sexo": "macho",
+    "porte": "pequeno",
+    "raca": "SRD",
+    "saude": {
+      "vacinado": true,
+      "vermifugado": true,
+      "castrado": false
+    },
+    "convivencia": {
+      "outrosAnimais": false,
+      "criancas": false
+    },
+    "condicoes": {
+      "cuidadosEspeciais": false,
+      "idoso": false,
+      "deficiencia": false
+    }
+  },
+  {
+    "id": "7b1b002d-0a20-4e9a-9b38-991e27e7c978",
+    "foto": "1765041197491-doguinho.webp",
+    "isInterested": false,
+    "nome": "Robertinho",
+    "especie": "cachorro",
+    "descricao": "Teste",
+    "dataNascimento": "2001-12-03",
+    "sexo": "macho",
+    "porte": "medio",
+    "raca": "SRD",
+    "saude": {
+      "vacinado": false,
+      "vermifugado": true,
+      "castrado": false
+    },
+    "convivencia": {
+      "outrosAnimais": false,
+      "criancas": false
+    },
+    "condicoes": {
+      "cuidadosEspeciais": false,
+      "idoso": false,
+      "deficiencia": false
+    }
+  }
+]
