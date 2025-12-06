@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Quicksand } from "next/font/google";
 import "./globals.css";
 import { ThemeModeProvider } from "@/context/ThemeContext";
+import { ToastProvider } from "@/context/ToastContext";
 
 const quicksand = Quicksand({
   variable: "--font-quicksand", 
@@ -25,7 +26,7 @@ export default function RootLayout({
         className={`${quicksand.variable} antialiased`}
       >
         <ThemeModeProvider>
-          <main>{children}</main>
+          <ToastProvider>{children}</ToastProvider>
         </ThemeModeProvider>
       </body>
     </html>

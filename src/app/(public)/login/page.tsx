@@ -9,10 +9,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { useToast } from "@/context/ToastContext";
 
 export default function LoginPage() {
   const theme = useTheme();
   const router = useRouter();
+  const { showSuccess, showError } = useToast();
 
   const {
     register,
@@ -22,13 +24,25 @@ export default function LoginPage() {
     resolver: zodResolver(loginSchema),
   });
 
-   const onSubmit = (data: LoginData) => {
-    console.log("Login:", data);
+  const onSubmit = async (data: LoginData) => {
+    try {
+      const res = await fetch("/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
 
-    const loginOk = true; 
+      const result = await res.json();
 
-    if (loginOk) {
-      router.push("/home"); 
+      if (!res.ok) {
+        showError(result.error || "Email ou senha incorretos!");
+        return;
+      }
+
+      showSuccess("Login realizado com sucesso!");
+      router.push("/home");
+    } catch (err) {
+      showError("Erro inesperado no servidor!");
     }
   };
 
