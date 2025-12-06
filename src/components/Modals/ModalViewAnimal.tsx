@@ -1,6 +1,6 @@
 "use client";
 
-import { Modal, Box, Avatar } from "@mui/material";
+import { Modal, Box, Avatar, capitalize } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import React from "react";
 import CustomButton from "../Buttons/CustomButton";
@@ -8,6 +8,7 @@ import { Close, LocationOnOutlined } from "@mui/icons-material";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Animal } from "../../types/animal";
+import { formatAgeFromDate } from "@/utils/formatAge";
 
 interface ModalViewAnimalProps {
   open: boolean;
@@ -170,17 +171,17 @@ export default function ModalViewAnimal({
             <div className="flex gap-2">
               <p>Idade:</p>
               <p style={{ color: theme.palette.text.secondary }}>
-                {animal.dataNascimento}
+                {formatAgeFromDate(animal.dataNascimento)}
               </p>
             </div>
             <div className="grid grid-cols-2 gap-y-2">
               <div className="flex gap-2">
                 <p>Sexo:</p>
-                <p style={{ color: theme.palette.text.secondary }}>{animal.sexo}</p>
+                <p style={{ color: theme.palette.text.secondary }}>{capitalize(animal.sexo)}</p>
               </div>
               <div className="flex gap-2">
                 <p>Porte:</p>
-                <p style={{ color: theme.palette.text.secondary }}>{animal.porte}</p>
+                <p style={{ color: theme.palette.text.secondary }}>{capitalize(animal.porte)}</p>
               </div>
               <div className="flex gap-2">
                 <p>Espécie:</p>
