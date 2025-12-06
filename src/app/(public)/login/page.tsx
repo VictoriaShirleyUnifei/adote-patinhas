@@ -1,4 +1,3 @@
-// LoginPage.tsx
 "use client";
 
 import CustomButton from "@/components/Buttons/CustomButton";

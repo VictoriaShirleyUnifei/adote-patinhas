@@ -11,6 +11,8 @@ import Image from "next/image";
 import CustomButton from "../Buttons/CustomButton";
 import ModalViewAnimal from "../Modals/ModalViewAnimal";
 import { Animal } from "@/types/animal";
+import { formatAgeFromDate } from "@/utils/formatAge";
+import { capitalize } from "@/utils/captalize";
 interface CardAnimalProps {
   animal: Animal;
   variant?: "default" | "interested" | "myPets";
@@ -93,7 +95,7 @@ export default function CardAnimal({
       >
         <div className="flex justify-between">
           <p className="font-semibold" style={{ color: theme.palette.text.primary }}>
-            {animal.name}
+            {animal.nome}
           </p>
           {animal.distance && (
             <div className="flex">
@@ -107,8 +109,8 @@ export default function CardAnimal({
         
         <div className="relative w-full h-60">
           <Image
-            src={animal.image}
-            alt={`Foto de ${animal.name}`}
+            src={`/uploads/${animal.foto}`}
+            alt={`Foto de ${animal.nome}`}
             fill
             className="rounded-lg object-cover"
           />
@@ -120,7 +122,7 @@ export default function CardAnimal({
               Idade:
             </p>
             <p className="font-semibold" style={{ color: theme.palette.text.secondary }}>
-              {animal.age}
+              {formatAgeFromDate(animal.dataNascimento)}
             </p>
           </div>
           <div className="flex justify-between">
@@ -129,7 +131,7 @@ export default function CardAnimal({
                 Sexo:
               </p>
               <p className="font-semibold" style={{ color: theme.palette.text.secondary }}>
-                {animal.sex}
+                {capitalize(animal.sexo)}
               </p>
             </div>
             <div className="flex gap-1">
@@ -137,7 +139,7 @@ export default function CardAnimal({
                 Porte:
               </p>
               <p className="font-semibold" style={{ color: theme.palette.text.secondary }}>
-                {animal.size}
+                {capitalize(animal.porte)}
               </p>
             </div>
           </div>

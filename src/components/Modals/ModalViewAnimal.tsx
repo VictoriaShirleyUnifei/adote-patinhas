@@ -1,6 +1,6 @@
 "use client";
 
-import { Modal, Box, Avatar } from "@mui/material";
+import { Modal, Box, Avatar, capitalize } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import React from "react";
 import CustomButton from "../Buttons/CustomButton";
@@ -8,6 +8,7 @@ import { Close, LocationOnOutlined } from "@mui/icons-material";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Animal } from "../../types/animal";
+import { formatAgeFromDate } from "@/utils/formatAge";
 
 interface ModalViewAnimalProps {
   open: boolean;
@@ -77,18 +78,18 @@ export default function ModalViewAnimal({
 
   // Status do animal (vacinado, castrado, etc.)
   const animalStatus = [
-    animal.vaccinated && "Vacinado",
-    animal.castrated && "Castrado",
-    animal.dewormed && "Vermifugado"
+    animal.saude?.vacinado && "Vacinado",
+    animal.saude?.castrado && "Castrado",
+    animal.saude?.vermifugado && "Vermifugado"
   ].filter(Boolean).join(" | ");
 
   // Características comportamentais
   const behavioralTraits = [
-    animal.getsAlongWithAnimals && "Se dá bem com outros animais",
-    animal.getsAlongWithChildren && "Se dá bem com crianças",
-    animal.needsSpecialCare && "Necessita cuidados especiais",
-    animal.isElderly && "Animal idoso",
-    animal.hasDisability && "Animal com deficiência"
+    animal.convivencia?.outrosAnimais && "Se dá bem com outros animais",
+    animal.convivencia?.criancas && "Se dá bem com crianças",
+    animal.condicoes?.cuidadosEspeciais && "Necessita cuidados especiais",
+    animal.condicoes?.idoso && "Animal idoso",
+    animal.condicoes?.deficiencia && "Animal com deficiência"
   ].filter(Boolean);
 
   return (
@@ -122,7 +123,7 @@ export default function ModalViewAnimal({
             </div>
 
             <div className="hidden md:flex md:justify-between">
-              <p className="font-semibold">{animal.name}</p>
+              <p className="font-semibold">{animal.nome}</p>
               {animal.distance && (
                 <div className="flex items-center gap-1">
                   <LocationOnOutlined />
@@ -133,16 +134,15 @@ export default function ModalViewAnimal({
             
             <div className="relative w-full h-64">
               <Image
-                src={animal.image}
-                alt={`Foto de ${animal.name}`}
+                src={`/uploads/${animal.foto}`}
+                alt={`Foto de ${animal.nome}`}
                 fill
-                className="object-cover rounded-lg mt-2"
-                priority
+                className="rounded-lg object-cover"
               />
             </div>
 
             <div className="flex justify-between mt-4 md:hidden">
-              <p className="font-semibold">{animal.name}</p>
+              <p className="font-semibold">{animal.nome}</p>
               {animal.distance && (
                 <div className="flex items-center gap-1">
                   <LocationOnOutlined />
@@ -158,7 +158,7 @@ export default function ModalViewAnimal({
             </div>
             <p>Descrição:</p>
             <p style={{ color: theme.palette.text.secondary }}>
-              {animal.description || "Descrição não disponível."}
+              {animal.descricao || "Descrição não disponível."}
             </p>
             {animalStatus && (
               <p className="block font-semibold mt-3 md:hidden">{animalStatus}</p>
@@ -171,28 +171,28 @@ export default function ModalViewAnimal({
             <div className="flex gap-2">
               <p>Idade:</p>
               <p style={{ color: theme.palette.text.secondary }}>
-                {animal.age}
+                {formatAgeFromDate(animal.dataNascimento)}
               </p>
             </div>
             <div className="grid grid-cols-2 gap-y-2">
               <div className="flex gap-2">
                 <p>Sexo:</p>
-                <p style={{ color: theme.palette.text.secondary }}>{animal.sex}</p>
+                <p style={{ color: theme.palette.text.secondary }}>{capitalize(animal.sexo)}</p>
               </div>
               <div className="flex gap-2">
                 <p>Porte:</p>
-                <p style={{ color: theme.palette.text.secondary }}>{animal.size}</p>
+                <p style={{ color: theme.palette.text.secondary }}>{capitalize(animal.porte)}</p>
               </div>
               <div className="flex gap-2">
                 <p>Espécie:</p>
                 <p style={{ color: theme.palette.text.secondary }}>
-                  {animal.species || "Não informado"}
+                  {animal.especie || "Não informado"}
                 </p>
               </div>
               <div className="flex gap-2">
                 <p>Raça:</p>
                 <p style={{ color: theme.palette.text.secondary }}>
-                  {animal.breed || "Não informado"}
+                  {animal.raca || "Não informado"}
                 </p>
               </div>
             </div>
@@ -224,18 +224,18 @@ export default function ModalViewAnimal({
             <div className="flex gap-4 items-center">
               <Avatar
                 src={animal.tutor.avatar || "/default-avatar.png"}
-                alt={`Foto de ${animal.tutor.name}`}
+                alt={`Foto de ${animal.tutor.nome}`}
                 sx={{ width: 60, height: 60, cursor: "pointer" }}
               />
               <div>
-                <p>{animal.tutor.name}</p>
+                <p>{animal.tutor.nome}</p>
                 <p style={{ color: theme.palette.text.secondary }}>
-                  {animal.tutor.phone}
+                  {animal.tutor.telefone}
                 </p>
-                {animal.publicationDate && (
+                {animal.dataPublicacao && (
                   <div className="flex text-[10px] gap-1" style={{ color: theme.palette.secondary.main }}>
                     <p>Data da publicação:</p>
-                    <p>{animal.publicationDate}</p>
+                    <p>{animal.dataPublicacao}</p>
                   </div>
                 )}
               </div>
