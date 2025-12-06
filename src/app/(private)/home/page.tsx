@@ -4,28 +4,45 @@ import CustomButton from "@/components/Buttons/CustomButton";
 import CardAnimal from "@/components/Cards/CardAnimal";
 import Filter from "@/components/Filter/Filter";
 import ModalRegisterAnimal from "@/components/Modals/ModalRegisterAnimal";
-import { mockAnimals } from "@/mocks/animal";
 import { PetsOutlined } from "@mui/icons-material";
 import { Card } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
-import React from "react";
+import React, { useCallback, useEffect } from "react";
+import { Animal } from "@/types/animal";
 
 export default function HomePage() {
   const theme = useTheme();
   const [openModal, setOpenModal] = React.useState(false);
-  const [animals, setAnimals] = React.useState(mockAnimals);
+  const [animals, setAnimals] = React.useState<Animal[]>([]);
 
+  
+  const loadAnimals = useCallback(async () => {
+    try {
+      const res = await fetch("/api/pets");
+      const data = await res.json();
+      setAnimals(data);
+    } catch (error) {
+      console.error("Erro ao carregar animais:", error);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadAnimals();
+  }, [loadAnimals]);
+  
   const handleInterestToggle = (animalId: string, interested: boolean) => {
     setAnimals((prevAnimals) =>
       prevAnimals.map((animal) =>
-        animal.id === animalId ? { ...animal, isInterested: interested } : animal
+        animal.id === animalId
+          ? { ...animal, isInterested: interested }
+          : animal
       )
     );
   };
 
   const renderCards = () => {
     return animals.map((animal) => (
-      <CardAnimal 
+      <CardAnimal
         key={animal.id}
         animal={animal}
         variant="default"
@@ -33,8 +50,6 @@ export default function HomePage() {
       />
     ));
   };
-
-  
 
   return (
     <>
@@ -68,7 +83,11 @@ export default function HomePage() {
         </div>
       </div>
 
-      <ModalRegisterAnimal open={openModal} onClose={() => setOpenModal(false)} />
+      <ModalRegisterAnimal
+        open={openModal}
+        onClose={() => setOpenModal(false)}
+        onSuccess={loadAnimals}
+      />
     </>
   );
 }
