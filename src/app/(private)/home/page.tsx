@@ -2,7 +2,7 @@
 
 import CustomButton from "@/components/Buttons/CustomButton";
 import CardAnimal from "@/components/Cards/CardAnimal";
-import Filter from "@/components/Filter/Filter";
+import Filter, { FilterValues } from "@/components/Filter/Filter";
 import ModalRegisterAnimal from "@/components/Modals/ModalRegisterAnimal";
 import { PetsOutlined } from "@mui/icons-material";
 import { Card } from "@mui/material";
@@ -14,8 +14,17 @@ export default function HomePage() {
   const theme = useTheme();
   const [openModal, setOpenModal] = React.useState(false);
   const [animals, setAnimals] = React.useState<Animal[]>([]);
+  const [filters, setFilters] = React.useState<FilterValues>({
+    species: "",
+    size: "",
+    breed: "",
+  });
+  const [appliedFilters, setAppliedFilters] = React.useState<FilterValues>({
+    species: "",
+    size: "",
+    breed: "",
+  });
 
-  
   const loadAnimals = useCallback(async () => {
     try {
       const res = await fetch("/api/pets");
@@ -29,7 +38,7 @@ export default function HomePage() {
   useEffect(() => {
     loadAnimals();
   }, [loadAnimals]);
-  
+
   const handleInterestToggle = (animalId: string, interested: boolean) => {
     setAnimals((prevAnimals) =>
       prevAnimals.map((animal) =>
@@ -40,8 +49,30 @@ export default function HomePage() {
     );
   };
 
+  const filteredAnimals = React.useMemo(() => {
+    return animals.filter((animal) => {
+      const matchSpecies =
+        !appliedFilters.species || animal.especie === appliedFilters.species;
+
+      const matchSize =
+        !appliedFilters.size || animal.porte === appliedFilters.size;
+
+      const matchBreed =
+        !appliedFilters.breed ||
+        animal.raca?.toLowerCase().includes(appliedFilters.breed.toLowerCase());
+
+      // const matchLocation =
+      //   !appliedFilters.location ||
+      //   animal.distance
+      //     ?.toLowerCase()
+      //     .includes(appliedFilters.location.toLowerCase());
+
+      return matchSpecies && matchSize && matchBreed;
+    });
+  }, [animals, appliedFilters]); 
+
   const renderCards = () => {
-    return animals.map((animal) => (
+    return filteredAnimals.map((animal) => (
       <CardAnimal
         key={animal.id}
         animal={animal}
@@ -76,7 +107,15 @@ export default function HomePage() {
               onClick={() => setOpenModal(true)}
             />
           </Card>
-          <Filter />
+          <Filter
+            onFilterChange={(values) => setFilters(values)}
+            onApplyFilters={() => setAppliedFilters(filters)}
+            onClearFilters={() => {
+              const empty = { species: "", size: "", breed: "", location: "" };
+              setFilters(empty);
+              setAppliedFilters(empty);
+            }}
+          />
         </div>
         <div className="flex flex-wrap gap-3 flex-1 max-h-screen overflow-y-auto">
           {renderCards()}
