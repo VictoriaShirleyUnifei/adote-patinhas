@@ -12,17 +12,21 @@ import {
   registerAnimalSchema,
 } from "@/schemas/registerAnimalSchema";
 import { useTheme } from "@mui/material/styles";
+import { useToast } from "@/context/ToastContext";
 
 type ModalRegisterAnimalProps = {
   open: boolean;
   onClose: () => void;
+  onSuccess?: () => void;
 };
 
 export default function ModalRegisterAnimal({
   open,
   onClose,
+  onSuccess,
 }: ModalRegisterAnimalProps) {
   const theme = useTheme();
+  const { showSuccess, showError } = useToast();
 
   const {
     control,
@@ -46,8 +50,47 @@ export default function ModalRegisterAnimal({
     },
   });
 
-  const onSubmit = (data: RegisterAnimalFormData) => {
-    console.log("Dados do formulário:", data);
+  const onSubmit = async (data: RegisterAnimalFormData) => {
+    try {
+      const formData = new FormData();
+
+      // Foto
+      if (data.foto) {
+        formData.append("foto", data.foto);
+      }
+
+      // Converte os outros campos (exceto foto)
+      Object.entries(data).forEach(([key, value]) => {
+        if (key === "foto") return;
+
+        if (typeof value === "object") {
+          // Para objetos: saude, convivencia, condicoes
+          formData.append(key, JSON.stringify(value));
+        } else {
+          formData.append(key, value);
+        }
+      });
+
+      const response = await fetch("/api/pets", {
+        method: "POST",
+        body: formData,
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        showError(result.error || "Erro ao salvar pet!");
+        return;
+      }
+
+      showSuccess("Pet salvo com sucesso!");
+      onSuccess?.();  
+      reset();
+      onClose();
+    } catch (err) {
+      console.error(err);
+      showError("Erro inesperado ao cadastrar o pet.");
+    }
   };
 
   const handleClose = () => {
