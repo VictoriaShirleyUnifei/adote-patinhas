@@ -72,6 +72,9 @@ export default function Filter({
         ]}
         value={filters.species}
         onChange={(e) => updateFilter("species", e.target.value)}
+        labelColor={theme.palette.text.primary}
+        backgroundColor={theme.palette.card.default}
+        borderColor={theme.palette.text.primary}
       />
 
       <CustomSelect
