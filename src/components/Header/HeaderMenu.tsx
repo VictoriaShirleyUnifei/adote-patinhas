@@ -13,6 +13,14 @@ export default function HeaderMenu() {
 
   const toggleMenu = () => setOpen(!open);
 
+  const handleLogout = async () => {
+    await fetch("/api/logout", {
+      method: "GET",
+    });
+
+    router.push("/login");
+  };
+
   return (
     <Box className="relative">
       {/* Avatar clicável */}
@@ -48,7 +56,7 @@ export default function HeaderMenu() {
 
             <Button
               variant="text"
-              onClick={() => router.push("/login")}
+              onClick={handleLogout}
               sx={{
                 color: theme.palette.secondary.main,
                 justifyContent: "flex-start",
