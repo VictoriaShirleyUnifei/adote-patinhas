@@ -1,17 +1,25 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import CardAnimal from "@/components/Cards/CardAnimal";
 import CardPersonalInfos from "@/components/Cards/CardPersonalInfos";
 import { Animal } from "@/types/animal";
 import { ArrowRight, Add } from "@mui/icons-material";
-import { Box, Button, Stack, Typography, CircularProgress } from "@mui/material";
+import {
+  Box,
+  Button,
+  Stack,
+  Typography,
+  CircularProgress,
+} from "@mui/material";
 import { useTheme } from "@mui/material/styles";
-import ModalRegisterAnimal from "@/components/Modals/ModalRegisterAnimal";
+import ModalAnimal from "@/components/Modals/ModalAnimal";
 
 export default function ProfilePage() {
   const theme = useTheme();
-  const [view, setView] = useState<"profile" | "animals" | "interests">("profile");
+  const [view, setView] = useState<"profile" | "animals" | "interests">(
+    "profile"
+  );
   const [animals, setAnimals] = useState<Animal[]>([]); // Todos animais
   const [myAnimals, setMyAnimals] = useState<Animal[]>([]); // Animais do usuário
   const [loading, setLoading] = useState(true);
@@ -19,6 +27,25 @@ export default function ProfilePage() {
   const [openModal, setOpenModal] = useState(false);
   const [modalMode, setModalMode] = useState<"create" | "edit">("create");
   const [selectedAnimal, setSelectedAnimal] = useState<Animal | undefined>();
+
+  const fetchMyAnimals = useCallback(async () => {
+    console.log("🔄 fetchMyAnimals chamado");
+    setLoadingMyAnimals(true);
+    try {
+      const response = await fetch("/api/pets/my-pets", {
+        cache: "no-store",
+        credentials: "include",
+      });
+      if (!response.ok) throw new Error("Falha ao buscar animais");
+      const data = await response.json();
+      console.log("✅ fetchMyAnimals: dados recebidos", data.length, "itens");
+      setMyAnimals(data);
+    } catch (error) {
+      console.error("❌ fetchMyAnimals erro:", error);
+    } finally {
+      setLoadingMyAnimals(false);
+    }
+  }, []);
 
   // Busca todos os animais (para a aba de interesses)
   useEffect(() => {
@@ -34,49 +61,23 @@ export default function ProfilePage() {
     fetchAnimals();
   }, []);
 
-  // Busca apenas os animais do usuário logado
+  // Busca animais do usuário quando a view muda para "animals"
   useEffect(() => {
-    async function fetchMyAnimals() {
-      if (view !== "animals") return;
-      
-      setLoadingMyAnimals(true);
-      try {
-        const response = await fetch("/api/pets/my-pets", { 
-          cache: "no-store",
-          credentials: "include"
-        });
-        
-        if (response.status === 401) {
-          console.error("Usuário não autenticado");
-          return;
-        }
-        
-        if (!response.ok) {
-          throw new Error(`Erro ${response.status}: ${response.statusText}`);
-        }
-        
-        const data = await response.json();
-        setMyAnimals(data);
-      } catch (error) {
-        console.error("Erro ao carregar meus animais:", error);
-      } finally {
-        setLoadingMyAnimals(false);
-      }
-    }
-
     fetchMyAnimals();
-  }, [view]);
+  }, [fetchMyAnimals]);
 
   const handleInterestToggle = (animalId: string, interested: boolean) => {
     setAnimals((prevAnimals) =>
       prevAnimals.map((animal) =>
-        animal.id === animalId ? { ...animal, isInterested: interested } : animal
+        animal.id === animalId
+          ? { ...animal, isInterested: interested }
+          : animal
       )
     );
   };
 
   const handleEditAnimal = (animalId: string) => {
-    const animal = myAnimals.find(a => a.id === animalId);
+    const animal = myAnimals.find((a) => a.id === animalId);
     setSelectedAnimal(animal);
     setModalMode("edit");
     setOpenModal(true);
@@ -86,12 +87,19 @@ export default function ProfilePage() {
     try {
       const response = await fetch(`/api/pets?id=${animalId}`, {
         method: "DELETE",
-        credentials: "include"
+        credentials: "include",
       });
 
       if (response.ok) {
-        // Remove o animal da lista local
-        setMyAnimals(prev => prev.filter(animal => animal.id !== animalId));
+        // Remove o animal da lista local IMEDIATAMENTE
+        setMyAnimals((prev) => prev.filter((animal) => animal.id !== animalId));
+
+        // Recarrega os animais para garantir sincronização
+        fetchMyAnimals();
+
+        console.log("Animal excluído com sucesso!");
+      } else {
+        console.error("Erro ao excluir animal:", await response.text());
       }
     } catch (error) {
       console.error("Erro ao excluir animal:", error);
@@ -106,32 +114,17 @@ export default function ProfilePage() {
 
   const handleAdoptAnimal = (animalId: string) => {
     console.log("Marcar como adotado:", animalId);
-    // Implemente a lógica de adoção aqui
   };
 
-  const handleModalSuccess = () => {
-    // Recarrega os animais após cadastro/edição
-    async function reloadMyAnimals() {
-      try {
-        const response = await fetch("/api/pets/my-pets", { 
-          cache: "no-store",
-          credentials: "include"
-        });
-        
-        if (response.ok) {
-          const data = await response.json();
-          setMyAnimals(data);
-        }
-      } catch (error) {
-        console.error("Erro ao recarregar animais:", error);
-      }
-    }
-    reloadMyAnimals();
-  };
-
-  const handleViewProfile = () => setView("profile");
-  const handleViewRegisteredAnimals = () => setView("animals");
-  const handleViewInterestList = () => setView("interests");
+  // Função chamada após sucesso no modal
+  const handleModalSuccess = useCallback(() => {
+    console.log("✅ handleModalSuccess chamado - recarregando animais");
+    fetchMyAnimals();
+    setOpenModal(false);
+    setSelectedAnimal(undefined);
+  }, [fetchMyAnimals]);
+    const handleViewProfile = () => setView("profile");
+    const handleViewRegisteredAnimals = () => setView("animals");
 
   const renderMyAnimals = () => {
     if (loadingMyAnimals) {
@@ -148,16 +141,20 @@ export default function ProfilePage() {
           <Typography variant="h6" color="text.tertiary">
             Você ainda não cadastrou nenhum pet
           </Typography>
-          <Typography variant="body2" color="text.tertiary" sx={{ mt: 1, mb: 3 }}>
+          <Typography
+            variant="body2"
+            color="text.tertiary"
+            sx={{ mt: 1, mb: 3 }}
+          >
             Cadastre seu primeiro pet para encontrar um lar amoroso!
           </Typography>
           <Button
             variant="contained"
             startIcon={<Add />}
             onClick={handleAddNewAnimal}
-            sx={{ 
+            sx={{
               bgcolor: theme.palette.secondary.main,
-              '&:hover': { bgcolor: theme.palette.secondary.dark }
+              "&:hover": { bgcolor: theme.palette.secondary.dark },
             }}
           >
             Cadastrar primeiro pet
@@ -167,10 +164,10 @@ export default function ProfilePage() {
     }
 
     return (
-      <>        
+      <>
         <div className="flex flex-wrap gap-3">
           {myAnimals.map((animal) => (
-            <CardAnimal 
+            <CardAnimal
               key={animal.id}
               animal={animal}
               variant="myPets"
@@ -184,17 +181,6 @@ export default function ProfilePage() {
         </div>
       </>
     );
-  };
-
-  const renderAllAnimals = () => {
-    return animals.map((animal) => (
-      <CardAnimal 
-        key={animal.id}
-        animal={animal}
-        variant="default"
-        onInterestToggle={handleInterestToggle}
-      />
-    ));
   };
 
   return (
@@ -285,7 +271,7 @@ export default function ProfilePage() {
       </div>
 
       {/* Modal unificado para criar/editar */}
-      <ModalRegisterAnimal 
+      <ModalAnimal
         open={openModal}
         onClose={() => setOpenModal(false)}
         mode={modalMode}
