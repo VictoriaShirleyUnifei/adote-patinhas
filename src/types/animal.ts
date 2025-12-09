@@ -36,12 +36,10 @@ export interface Animal {
   };
 
   // Tutor / responsável
-  tutor?: {
-    nome: string;
-    telefone: string;
-    avatar?: string;
-  };
-
-  // Publicação
-  dataPublicacao?: string;
+  userId: string;
+  userName: string;
+  userPhone: string;
+  userEmail: string;
+  userFoto: string;
+  cadastroData?: string;
 }

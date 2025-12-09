@@ -3,6 +3,24 @@
     "id": "6f4feb7b-1bd1-4dfe-abaa-e27acb326561",
     "nome": "Victória Silva",
     "email": "victoria@gmail.com",
-    "senha": "$2b$10$pVpQcui8jgJ67K33GQEIrOaLmfH4xXER8djKMR0Zfqk/or6aSD8Y2"
+    "senha": "$2b$10$u3ZG2jUlh.EkLs9uARYYFu5eLl45mx0MwIfkiODQS3SdKtNQQmO06",
+    "phone": "35988759300",
+    "cep": "37502118",
+    "uf": "MG",
+    "city": "Itajubá",
+    "street": "Rua Orlando Mohallen",
+    "foto": "/uploads/1765227664175-6f4feb7b-1bd1-4dfe-abaa-e27acb326561.jpeg"
+  },
+  {
+    "id": "f83fdcde-1ca8-4a5f-ab84-cc21edfd5b1a",
+    "nome": "Teste da Silva",
+    "email": "teste@gmail.com",
+    "senha": "$2b$10$CxFPzRs3vDpppUCF71Fmme7JGd7QKd40LaMaRsx2SLkaink5/.pBS",
+    "phone": "",
+    "cep": "",
+    "uf": "",
+    "city": "",
+    "street": "",
+    "foto": ""
   }
 ]

@@ -1,12 +1,15 @@
+// Header.tsx
 "use client";
 
 import { useTheme } from "@mui/material/styles";
 import ButtonTheme from "../Buttons/ButtonTheme";
 import HeaderMenu from "./HeaderMenu";
 import Image from "next/image";
+import { useUserData } from "@/hooks/useUserData";
 
 export default function Header() {
   const theme = useTheme();
+  const { userData, loading } = useUserData();
 
   const routeToHome = () => {
     window.location.href = "/home";
@@ -14,8 +17,8 @@ export default function Header() {
 
   const logo =
     theme.palette.mode === "light"
-      ? "/logo-marrom.svg" // logo para modo claro
-      : "/logo-branca.svg"; // logo para modo escuro
+      ? "/logo-marrom.svg"
+      : "/logo-branca.svg";
 
   return (
     <header
@@ -30,11 +33,24 @@ export default function Header() {
 
       <div className="flex gap-6 justify-center items-center">
         <div className="ml-auto text-right hidden md:flex md:flex-col">
-          <p
-            className="font-bold" 
-            style={{ color: theme.palette.secondary.main}}
-            >Victória Silva</p>
-          <p className="font-bold">victoriasilva@gmail.com</p>
+          {loading ? (
+            <div className="space-y-2">
+              <div className="h-5 w-32 bg-gray-300 rounded animate-pulse"></div>
+              <div className="h-4 w-40 bg-gray-200 rounded animate-pulse"></div>
+            </div>
+          ) : (
+            <>
+              <p
+                className="font-bold truncate max-w-[200px]" 
+                style={{ color: theme.palette.secondary.main }}
+              >
+                {userData?.nome || "Usuário"}
+              </p>
+              <p className="font-bold truncate max-w-[200px]">
+                {userData?.email}
+              </p>
+            </>
+          )}
         </div>
 
         <div>

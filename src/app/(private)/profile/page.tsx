@@ -1,35 +1,72 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import CardAnimal from "@/components/Cards/CardAnimal";
 import CardPersonalInfos from "@/components/Cards/CardPersonalInfos";
-import Filter from "@/components/Filter/Filter";
 import { Animal } from "@/types/animal";
-import { ArrowRight } from "@mui/icons-material";
-import { Box, Button, Stack, Typography } from "@mui/material";
+import { ArrowRight, Add } from "@mui/icons-material";
+import { Box, Button, Stack, Typography, CircularProgress } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
-import React from "react";
+import ModalRegisterAnimal from "@/components/Modals/ModalRegisterAnimal";
 
 export default function ProfilePage() {
   const theme = useTheme();
-  const [view, setView] = React.useState<"profile" | "animals" | "interests">(
-    "profile"
-  );
- const [animals, setAnimals] = React.useState<Animal[]>([]);
+  const [view, setView] = useState<"profile" | "animals" | "interests">("profile");
+  const [animals, setAnimals] = useState<Animal[]>([]); // Todos animais
+  const [myAnimals, setMyAnimals] = useState<Animal[]>([]); // Animais do usuário
+  const [loading, setLoading] = useState(true);
+  const [loadingMyAnimals, setLoadingMyAnimals] = useState(false);
+  const [openModal, setOpenModal] = useState(false);
+  const [modalMode, setModalMode] = useState<"create" | "edit">("create");
+  const [selectedAnimal, setSelectedAnimal] = useState<Animal | undefined>();
 
- React.useEffect(() => {
-  async function fetchAnimals() {
-    try {
-      const response = await fetch("/api/animals", { cache: "no-store" });
-      const data = await response.json();
-      setAnimals(data);
-    } catch (error) {
-      console.error("Erro ao carregar animais", error);
+  // Busca todos os animais (para a aba de interesses)
+  useEffect(() => {
+    async function fetchAnimals() {
+      try {
+        const response = await fetch("/api/animals", { cache: "no-store" });
+        const data = await response.json();
+        setAnimals(data);
+      } catch (error) {
+        console.error("Erro ao carregar animais", error);
+      }
     }
-  }
+    fetchAnimals();
+  }, []);
 
-  fetchAnimals();
-}, []);
-  
+  // Busca apenas os animais do usuário logado
+  useEffect(() => {
+    async function fetchMyAnimals() {
+      if (view !== "animals") return;
+      
+      setLoadingMyAnimals(true);
+      try {
+        const response = await fetch("/api/pets/my-pets", { 
+          cache: "no-store",
+          credentials: "include"
+        });
+        
+        if (response.status === 401) {
+          console.error("Usuário não autenticado");
+          return;
+        }
+        
+        if (!response.ok) {
+          throw new Error(`Erro ${response.status}: ${response.statusText}`);
+        }
+        
+        const data = await response.json();
+        setMyAnimals(data);
+      } catch (error) {
+        console.error("Erro ao carregar meus animais:", error);
+      } finally {
+        setLoadingMyAnimals(false);
+      }
+    }
+
+    fetchMyAnimals();
+  }, [view]);
+
   const handleInterestToggle = (animalId: string, interested: boolean) => {
     setAnimals((prevAnimals) =>
       prevAnimals.map((animal) =>
@@ -38,11 +75,118 @@ export default function ProfilePage() {
     );
   };
 
+  const handleEditAnimal = (animalId: string) => {
+    const animal = myAnimals.find(a => a.id === animalId);
+    setSelectedAnimal(animal);
+    setModalMode("edit");
+    setOpenModal(true);
+  };
+
+  const handleDeleteAnimal = async (animalId: string) => {
+    try {
+      const response = await fetch(`/api/pets?id=${animalId}`, {
+        method: "DELETE",
+        credentials: "include"
+      });
+
+      if (response.ok) {
+        // Remove o animal da lista local
+        setMyAnimals(prev => prev.filter(animal => animal.id !== animalId));
+      }
+    } catch (error) {
+      console.error("Erro ao excluir animal:", error);
+    }
+  };
+
+  const handleAddNewAnimal = () => {
+    setSelectedAnimal(undefined);
+    setModalMode("create");
+    setOpenModal(true);
+  };
+
+  const handleAdoptAnimal = (animalId: string) => {
+    console.log("Marcar como adotado:", animalId);
+    // Implemente a lógica de adoção aqui
+  };
+
+  const handleModalSuccess = () => {
+    // Recarrega os animais após cadastro/edição
+    async function reloadMyAnimals() {
+      try {
+        const response = await fetch("/api/pets/my-pets", { 
+          cache: "no-store",
+          credentials: "include"
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          setMyAnimals(data);
+        }
+      } catch (error) {
+        console.error("Erro ao recarregar animais:", error);
+      }
+    }
+    reloadMyAnimals();
+  };
+
   const handleViewProfile = () => setView("profile");
   const handleViewRegisteredAnimals = () => setView("animals");
   const handleViewInterestList = () => setView("interests");
 
-  const renderCards = () => {
+  const renderMyAnimals = () => {
+    if (loadingMyAnimals) {
+      return (
+        <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
+          <CircularProgress sx={{ color: theme.palette.secondary.main }} />
+        </Box>
+      );
+    }
+
+    if (myAnimals.length === 0) {
+      return (
+        <Box sx={{ textAlign: "center", py: 4 }}>
+          <Typography variant="h6" color="text.tertiary">
+            Você ainda não cadastrou nenhum pet
+          </Typography>
+          <Typography variant="body2" color="text.tertiary" sx={{ mt: 1, mb: 3 }}>
+            Cadastre seu primeiro pet para encontrar um lar amoroso!
+          </Typography>
+          <Button
+            variant="contained"
+            startIcon={<Add />}
+            onClick={handleAddNewAnimal}
+            sx={{ 
+              bgcolor: theme.palette.secondary.main,
+              '&:hover': { bgcolor: theme.palette.secondary.dark }
+            }}
+          >
+            Cadastrar primeiro pet
+          </Button>
+        </Box>
+      );
+    }
+
+    return (
+      <>        
+        <div className="flex flex-wrap gap-3">
+          {myAnimals.map((animal) => (
+            <CardAnimal 
+              key={animal.id}
+              animal={animal}
+              variant="myPets"
+              onInterestToggle={handleInterestToggle}
+              onAdopt={handleAdoptAnimal}
+              onEdit={handleEditAnimal}
+              onDelete={handleDeleteAnimal}
+              showInterestButton={false}
+            />
+          ))}
+        </div>
+      </>
+    );
+  };
+
+  const renderAllAnimals = () => {
     return animals.map((animal) => (
       <CardAnimal 
         key={animal.id}
@@ -77,10 +221,11 @@ export default function ProfilePage() {
                   justifyContent: "flex-start",
                   gap: 1,
                   textTransform: "none",
+                  fontWeight: view === "profile" ? "bold" : "normal",
                 }}
                 startIcon={<ArrowRight />}
               >
-                <p className="font-bold">Dados pessoais</p>
+                Dados pessoais
               </Button>
               <Button
                 variant="text"
@@ -90,12 +235,13 @@ export default function ProfilePage() {
                   justifyContent: "flex-start",
                   gap: 1,
                   textTransform: "none",
+                  fontWeight: view === "animals" ? "bold" : "normal",
                 }}
                 startIcon={<ArrowRight />}
               >
-                <p className="font-bold">Animais cadastrados</p>
+                Meus animais
               </Button>
-              <Button
+              {/* <Button
                 variant="text"
                 onClick={handleViewInterestList}
                 sx={{
@@ -103,14 +249,14 @@ export default function ProfilePage() {
                   justifyContent: "flex-start",
                   gap: 1,
                   textTransform: "none",
+                  fontWeight: view === "interests" ? "bold" : "normal",
                 }}
                 startIcon={<ArrowRight />}
               >
-                <p className="font-bold">Lista de interesses</p>
-              </Button>
+                Interesses
+              </Button> */}
             </Stack>
           </Box>
-          {/* <Filter /> */}
         </div>
 
         {view === "profile" && (
@@ -124,37 +270,28 @@ export default function ProfilePage() {
             <Box
               sx={{
                 backgroundColor: theme.palette.card.default,
-                color: theme.palette.tertiary.main,
+                color: theme.palette.secondary.main,
                 padding: "8px",
                 borderRadius: "8px",
               }}
             >
               <p className="font-bold text-center px-6">Animais cadastrados</p>
             </Box>
-            <div className="flex flex-wrap gap-3 flex-1 max-h-screen overflow-y-auto">
-              {renderCards()}
-            </div>
-          </div>
-        )}
-
-        {view === "interests" && (
-          <div className="flex flex-col gap-3 flex-1">
-            <Box
-              sx={{
-                backgroundColor: theme.palette.card.default,
-                color: theme.palette.tertiary.main,
-                padding: "8px",
-                borderRadius: "8px",
-              }}
-            >
-              <p className="font-bold text-center px-6">Lista de interesses</p>
-            </Box>
-            <div className="flex flex-wrap gap-3 flex-1 max-h-screen overflow-y-auto">
-              {renderCards()}
+            <div className="flex-1 max-h-screen overflow-y-auto p-2">
+              {renderMyAnimals()}
             </div>
           </div>
         )}
       </div>
+
+      {/* Modal unificado para criar/editar */}
+      <ModalRegisterAnimal 
+        open={openModal}
+        onClose={() => setOpenModal(false)}
+        mode={modalMode}
+        animal={selectedAnimal}
+        onSuccess={handleModalSuccess}
+      />
     </>
   );
 }
