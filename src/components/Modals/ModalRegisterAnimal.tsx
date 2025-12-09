@@ -1,6 +1,8 @@
-import { Close } from "@mui/icons-material";
-import { Box, Checkbox, Modal } from "@mui/material";
-import React from "react";
+"use client";
+
+import { Close, Delete } from "@mui/icons-material";
+import { Box, Checkbox, Modal, IconButton } from "@mui/material";
+import React, { useEffect } from "react";
 import PhotoUpload from "../Inputs/PhotoUpload";
 import CustomInput from "../Inputs/CustomInput";
 import CustomButton from "../Buttons/CustomButton";
@@ -13,20 +15,27 @@ import {
 } from "@/schemas/registerAnimalSchema";
 import { useTheme } from "@mui/material/styles";
 import { useToast } from "@/context/ToastContext";
+import { Animal } from "@/types/animal";
 
-type ModalRegisterAnimalProps = {
+type ModalAnimalProps = {
   open: boolean;
   onClose: () => void;
   onSuccess?: () => void;
+  mode?: "create" | "edit"; 
+  animal?: Animal; 
 };
 
-export default function ModalRegisterAnimal({
+export default function ModalAnimal({
   open,
   onClose,
   onSuccess,
-}: ModalRegisterAnimalProps) {
+  mode = "create",
+  animal,
+}: ModalAnimalProps) {
   const theme = useTheme();
   const { showSuccess, showError } = useToast();
+  const [loading, setLoading] = React.useState(false);
+  const [deleting, setDeleting] = React.useState(false);
 
   const {
     control,
@@ -50,13 +59,74 @@ export default function ModalRegisterAnimal({
     },
   });
 
+  // Preenche o formulário com os dados do animal quando estiver em modo edição
+  useEffect(() => {
+    if (mode === "edit" && animal && open) {
+      // Se a foto é uma string (caminho), converte para valor exibível
+      const fotoValue = animal.foto ? animal.foto : null;
+
+      reset({
+        foto: fotoValue,
+        nome: animal.nome || "",
+        especie: animal.especie || "",
+        descricao: animal.descricao || "",
+        dataNascimento: animal.dataNascimento || "",
+        sexo: animal.sexo || "",
+        porte: animal.porte || "",
+        raca: animal.raca || "",
+        saude: animal.saude || {
+          vacinado: false,
+          vermifugado: false,
+          castrado: false,
+        },
+        convivencia: animal.convivencia || {
+          outrosAnimais: false,
+          criancas: false,
+        },
+        condicoes: animal.condicoes || {
+          cuidadosEspeciais: false,
+          idoso: false,
+          deficiencia: false,
+        },
+      });
+    } else if (mode === "create" && open) {
+      // Limpa o formulário para cadastro
+      reset({
+        foto: null,
+        nome: "",
+        especie: "",
+        descricao: "",
+        dataNascimento: "",
+        sexo: "",
+        porte: "",
+        raca: "",
+        saude: { vacinado: false, vermifugado: false, castrado: false },
+        convivencia: { outrosAnimais: false, criancas: false },
+        condicoes: {
+          cuidadosEspeciais: false,
+          idoso: false,
+          deficiencia: false,
+        },
+      });
+    }
+  }, [mode, animal, open, reset]);
+
   const onSubmit = async (data: RegisterAnimalFormData) => {
+    setLoading(true);
     try {
       const formData = new FormData();
 
-      // Foto
-      if (data.foto) {
+      // Foto - se for File, adiciona
+      if (data.foto instanceof File) {
         formData.append("foto", data.foto);
+      } else if (mode === "edit" && animal?.foto && !data.foto) {
+        // Se estiver editando e removeu a foto, precisa enviar algo?
+        // Você pode querer enviar um campo indicando para remover a foto
+      }
+
+      // Se estiver editando, adiciona o ID
+      if (mode === "edit" && animal) {
+        formData.append("id", animal.id);
       }
 
       // Converte os outros campos (exceto foto)
@@ -64,32 +134,74 @@ export default function ModalRegisterAnimal({
         if (key === "foto") return;
 
         if (typeof value === "object") {
-          // Para objetos: saude, convivencia, condicoes
           formData.append(key, JSON.stringify(value));
         } else {
           formData.append(key, value);
         }
       });
 
+      // Usa método diferente para criar ou editar
+      const method = mode === "edit" ? "PUT" : "POST";
+      const successMessage =
+        mode === "edit"
+          ? "Pet atualizado com sucesso!"
+          : "Pet cadastrado com sucesso!";
+
       const response = await fetch("/api/pets", {
-        method: "POST",
+        method,
         body: formData,
       });
 
       const result = await response.json();
 
       if (!response.ok) {
-        showError(result.error || "Erro ao salvar pet!");
+        showError(
+          result.error ||
+            `Erro ao ${mode === "edit" ? "atualizar" : "salvar"} pet!`
+        );
         return;
       }
 
-      showSuccess("Pet salvo com sucesso!");
-      onSuccess?.();  
+      showSuccess(successMessage);
+      onSuccess?.();
       reset();
       onClose();
     } catch (err) {
       console.error(err);
-      showError("Erro inesperado ao cadastrar o pet.");
+      showError(
+        `Erro inesperado ao ${
+          mode === "edit" ? "atualizar" : "cadastrar"
+        } o pet.`
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!animal || mode !== "edit") return;
+
+    setDeleting(true);
+    try {
+      const response = await fetch(`/api/pets?id=${animal.id}`, {
+        method: "DELETE",
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        showError(result.error || "Erro ao excluir pet!");
+        return;
+      }
+
+      showSuccess("Pet excluído com sucesso!");
+      onSuccess?.();
+      onClose();
+    } catch (err) {
+      console.error(err);
+      showError("Erro inesperado ao excluir o pet.");
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -97,6 +209,15 @@ export default function ModalRegisterAnimal({
     reset();
     onClose();
   };
+
+  const title = mode === "edit" ? "Editar Pet" : "Cadastrar Pet";
+  const submitButtonText = loading
+    ? mode === "edit"
+      ? "Salvando..."
+      : "Cadastrando..."
+    : mode === "edit"
+    ? "Salvar alterações"
+    : "Cadastrar";
 
   return (
     <Modal open={open} onClose={handleClose}>
@@ -121,22 +242,21 @@ export default function ModalRegisterAnimal({
           p: 2,
         }}
       >
-        {/* --- Conteúdo principal --- */}
+        {/* --- Cabeçalho --- */}
         <section>
-          <div>
-            {/* --- Close responsivo --- */}
-            <div
-              className="flex flex-row justify-between cursor-pointer mb-2"
-              onClick={handleClose}>
-              <h2
-                style={{
-                  color: theme.palette.secondary.main,
-                  fontWeight: "bold",
-                }}
-              >
-                Cadastrar Pet
-              </h2>
-              <Close />
+          <div className="flex flex-row justify-between items-center mb-2">
+            <h2
+              style={{
+                color: theme.palette.secondary.main,
+                fontWeight: "bold",
+              }}
+            >
+              {title}
+            </h2>
+            <div className="flex gap-2">
+              <div className="cursor-pointer" onClick={handleClose}>
+                <Close />
+              </div>
             </div>
           </div>
         </section>
@@ -502,11 +622,20 @@ export default function ModalRegisterAnimal({
           </section>
         </div>
 
-        <section className="flex justify-center md:justify-end mt-4">
+        <section className="flex justify-between mt-4">
+          {mode === "edit" && (
+            <CustomButton
+              textButton="Excluir"
+              backgroundColor={theme.palette.error.main}
+              color="white"
+              sx={{ width: 200 }}
+              onClick={handleDelete}
+            />
+          )}
           <CustomButton
-            textButton="Cadastrar"
+            textButton={submitButtonText}
             backgroundColor={theme.palette.secondary.main}
-            sx={{ width: 320 }}
+            sx={{ width: 200 }}
             onClick={handleSubmit(onSubmit)}
           />
         </section>
