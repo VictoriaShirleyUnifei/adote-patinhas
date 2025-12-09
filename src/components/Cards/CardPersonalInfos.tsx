@@ -369,7 +369,7 @@ export default function CardPersonalInfos() {
             maxWidth: "100%",
           }}
         />
-        <CustomButton
+        {/* <CustomButton
           textButton="Excluir conta"
           backgroundColor={theme.palette.tertiary.main}
           color="white"
@@ -377,7 +377,7 @@ export default function CardPersonalInfos() {
             width: { xs: "100%", sm: "200px", lg: "280px", xl: "320px" },
             maxWidth: "100%",
           }}
-        />
+        /> */}
       </section>
     </Box>
   );
