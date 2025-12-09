@@ -25,7 +25,6 @@ export async function GET(req: Request) {
   }
 }
 
-// Adicione também o PUT para atualizar perfil
 export async function PUT(req: Request) {
   try {
     const user = await getUserFromRequest(req);
@@ -68,7 +67,7 @@ export async function PUT(req: Request) {
     const newPassword = formData.get("newPassword");
     
     if (currentPassword && newPassword) {
-      // Aqui você precisaria verificar a senha atual
+      // falta verificar a senha atual
       // usando bcrypt.compare
       // updatedUser.senha = await bcrypt.hash(newPassword, 10);
     }
