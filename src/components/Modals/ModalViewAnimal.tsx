@@ -2,13 +2,14 @@
 
 import { Modal, Box, Avatar, capitalize } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import CustomButton from "../Buttons/CustomButton";
 import { Close, LocationOnOutlined } from "@mui/icons-material";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Animal } from "../../types/animal";
 import { formatAgeFromDate } from "@/utils/formatAge";
+import { formatRelativeDate } from "@/utils/formatDate";
 
 interface ModalViewAnimalProps {
   open: boolean;
@@ -17,6 +18,16 @@ interface ModalViewAnimalProps {
   variant?: "default" | "interested" | "myPets";
   onInterestToggle?: (animalId: string, interested: boolean) => void;
   onAdopt?: (animalId: string) => void;
+}
+
+interface UserInfo {
+  id?: string;
+  nome?: string;
+  telefone?: string;
+  phone?: string;
+  email?: string;
+  foto?: string;
+  avatar?: string;
 }
 
 export default function ModalViewAnimal({
@@ -29,13 +40,29 @@ export default function ModalViewAnimal({
 }: ModalViewAnimalProps) {
   const theme = useTheme();
   const router = useRouter();
+  const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
+
+  // Extrai informações do usuário do animal
+  useEffect(() => {
+    if (animal) {
+      const userData: UserInfo = {
+        id: animal.id,
+        nome: animal.nome,
+        telefone: animal.userPhone,
+        phone: animal.userPhone,
+        email: animal.userEmail,
+        foto: animal.userFoto,
+        avatar: animal.userFoto || "/default-avatar.png"
+      };
+      setUserInfo(userData);
+    }
+  }, [animal]);
 
   const handleInterestClick = () => {
     if (onInterestToggle) {
       const newInterestState = !animal.isInterested;
       onInterestToggle(animal.id, newInterestState);
       
-      // Se marcou interesse, redireciona para o perfil
       if (newInterestState && variant === "default") {
         router.push("/perfil?tab=interesses");
       }
@@ -115,7 +142,7 @@ export default function ModalViewAnimal({
           p: 2
         }}
       >
-        {/* Conteúdo do modal (mantenha igual ao anterior) */}
+        {/* Conteúdo do modal */}
         <section className="grid grid-cols-1 md:grid-cols-[1fr_2fr] gap-4">
           <div>
             <div className="flex justify-end cursor-pointer md:hidden" onClick={onClose}>
@@ -138,6 +165,10 @@ export default function ModalViewAnimal({
                 alt={`Foto de ${animal.nome}`}
                 fill
                 className="rounded-lg object-cover"
+                onError={(e) => {
+                  // Fallback se a imagem não carregar
+                  e.currentTarget.src = "/default-pet.jpg";
+                }}
               />
             </div>
 
@@ -206,12 +237,12 @@ export default function ModalViewAnimal({
               <div className="flex flex-col text-center md:grid md:grid-cols-2 md:gap-y-2 md:text-start mt-2 md:mt-0">
                 <div>
                   {behavioralTraits.slice(0, Math.ceil(behavioralTraits.length / 2)).map((trait, index) => (
-                    <p key={index}>{trait}</p>
+                    <p key={index} style={{ color: theme.palette.text.secondary }}>{trait}</p>
                   ))}
                 </div>
                 <div>
                   {behavioralTraits.slice(Math.ceil(behavioralTraits.length / 2)).map((trait, index) => (
-                    <p key={index}>{trait}</p>
+                    <p key={index} style={{ color: theme.palette.text.secondary }}>{trait}</p>
                   ))}
                 </div>
               </div>
@@ -220,27 +251,30 @@ export default function ModalViewAnimal({
         </section>
 
         <section className="flex flex-col md:flex-row justify-between items-center pt-4 font-semibold text-sm gap-4">
-          {animal.tutor && (
             <div className="flex gap-4 items-center">
               <Avatar
-                src={animal.tutor.avatar || "/default-avatar.png"}
-                alt={`Foto de ${animal.tutor.nome}`}
-                sx={{ width: 60, height: 60, cursor: "pointer" }}
-              />
+                src={animal.userFoto || "/default-avatar.png"}
+                alt={`Foto de ${animal.userName}`}
+                sx={{ 
+                  width: 60, 
+                  height: 60, 
+                  color: "#fff",
+                  backgroundColor: theme.palette.tertiary.main,
+                }}
+              >
+                {!animal.userFoto && animal.userName ? animal.userName.charAt(0).toUpperCase() : null}
+              </Avatar>
               <div>
-                <p>{animal.tutor.nome}</p>
+                <p>{animal.userName}</p>
                 <p style={{ color: theme.palette.text.secondary }}>
-                  {animal.tutor.telefone}
+                  {animal.userPhone}
                 </p>
-                {animal.dataPublicacao && (
-                  <div className="flex text-[10px] gap-1" style={{ color: theme.palette.secondary.main }}>
-                    <p>Data da publicação:</p>
-                    <p>{animal.dataPublicacao}</p>
-                  </div>
-                )}
+                <div className="flex text-[10px] gap-1" style={{ color: theme.palette.secondary.main }}>
+                  <p>Data da publicação:</p>
+                  <p>{formatRelativeDate(animal.cadastroData)}</p>
+                </div>
               </div>
             </div>
-          )}
 
           <CustomButton
             textButton={buttonConfig.text}
