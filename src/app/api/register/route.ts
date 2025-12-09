@@ -33,9 +33,17 @@ export async function POST(req: Request) {
 
     const newUser = {
       id: crypto.randomUUID(),
-      nome: nome,
+      nome,
       email,
       senha: hashedPassword,
+
+      // Novos campos do perfil
+      phone: "",
+      cep: "",
+      uf: "",
+      city: "",
+      street: "",
+      foto: "",
     };
 
     users.push(newUser);
@@ -43,8 +51,10 @@ export async function POST(req: Request) {
     await writeFile(filePath, JSON.stringify(users, null, 2));
 
     return NextResponse.json({ success: true, user: newUser });
+
   } catch (error) {
     console.error(error);
+
     return NextResponse.json(
       { error: "Erro interno ao registrar." },
       { status: 500 }
