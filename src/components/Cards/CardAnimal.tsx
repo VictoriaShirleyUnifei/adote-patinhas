@@ -13,7 +13,7 @@ import ModalViewAnimal from "../Modals/ModalViewAnimal";
 import { Animal } from "@/types/animal";
 import { formatAgeFromDate } from "@/utils/formatAge";
 import { capitalize } from "@/utils/capitalize";
-import ModalRegisterAnimal from "../Modals/ModalRegisterAnimal";
+import ModalAnimal from "../Modals/ModalAnimal";
 
 interface CardAnimalProps {
   animal: Animal;
@@ -245,7 +245,7 @@ export default function CardAnimal({
 
       {/* Modal de edição (para meus pets) */}
       {variant === "myPets" && (
-        <ModalRegisterAnimal 
+        <ModalAnimal 
           open={openEditModal} 
           onClose={() => setOpenEditModal(false)}
           animal={animal}

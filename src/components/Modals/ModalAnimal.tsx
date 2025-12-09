@@ -1,7 +1,7 @@
 "use client";
 
-import { Close, Delete } from "@mui/icons-material";
-import { Box, Checkbox, Modal, IconButton } from "@mui/material";
+import { Close } from "@mui/icons-material";
+import { Box, Checkbox, Modal } from "@mui/material";
 import React, { useEffect } from "react";
 import PhotoUpload from "../Inputs/PhotoUpload";
 import CustomInput from "../Inputs/CustomInput";
@@ -16,13 +16,14 @@ import {
 import { useTheme } from "@mui/material/styles";
 import { useToast } from "@/context/ToastContext";
 import { Animal } from "@/types/animal";
+import { formatDate } from "@/utils/formatDate";
 
 type ModalAnimalProps = {
   open: boolean;
   onClose: () => void;
   onSuccess?: () => void;
-  mode?: "create" | "edit"; 
-  animal?: Animal; 
+  mode?: "create" | "edit";
+  animal?: Animal;
 };
 
 export default function ModalAnimal({
@@ -70,7 +71,7 @@ export default function ModalAnimal({
         nome: animal.nome || "",
         especie: animal.especie || "",
         descricao: animal.descricao || "",
-        dataNascimento: animal.dataNascimento || "",
+        dataNascimento: formatDate(animal.dataNascimento) || "",
         sexo: animal.sexo || "",
         porte: animal.porte || "",
         raca: animal.raca || "",
@@ -120,8 +121,7 @@ export default function ModalAnimal({
       if (data.foto instanceof File) {
         formData.append("foto", data.foto);
       } else if (mode === "edit" && animal?.foto && !data.foto) {
-        // Se estiver editando e removeu a foto, precisa enviar algo?
-        // Você pode querer enviar um campo indicando para remover a foto
+        formData.append("fotoUrl", String(animal.foto));
       }
 
       // Se estiver editando, adiciona o ID
@@ -179,35 +179,53 @@ export default function ModalAnimal({
   };
 
   const handleDelete = async () => {
-    if (!animal || mode !== "edit") return;
+  if (!animal || mode !== "edit") return;
 
-    setDeleting(true);
-    try {
-      const response = await fetch(`/api/pets?id=${animal.id}`, {
-        method: "DELETE",
-      });
+  setDeleting(true);
+  try {
+    const response = await fetch(`/api/pets?id=${animal.id}`, {
+      method: "DELETE",
+    });
 
-      const result = await response.json();
+    const result = await response.json();
 
-      if (!response.ok) {
-        showError(result.error || "Erro ao excluir pet!");
-        return;
-      }
-
-      showSuccess("Pet excluído com sucesso!");
-      onSuccess?.();
-      onClose();
-    } catch (err) {
-      console.error(err);
-      showError("Erro inesperado ao excluir o pet.");
-    } finally {
-      setDeleting(false);
+    if (!response.ok) {
+      showError(result.error || "Erro ao excluir pet!");
+      return;
     }
-  };
+
+    showSuccess("Pet excluído com sucesso!");
+    // Chama o onSuccess para atualizar a lista no ProfilePage
+    onSuccess?.();
+    onClose();
+  } catch (err) {
+    console.error(err);
+    showError("Erro inesperado ao excluir o pet.");
+  } finally {
+    setDeleting(false);
+  }
+};
 
   const handleClose = () => {
-    reset();
     onClose();
+
+    reset({
+      foto: null,
+      nome: "",
+      especie: "",
+      descricao: "",
+      dataNascimento: "",
+      sexo: "",
+      porte: "",
+      raca: "",
+      saude: { vacinado: false, vermifugado: false, castrado: false },
+      convivencia: { outrosAnimais: false, criancas: false },
+      condicoes: {
+        cuidadosEspeciais: false,
+        idoso: false,
+        deficiencia: false,
+      },
+    });
   };
 
   const title = mode === "edit" ? "Editar Pet" : "Cadastrar Pet";

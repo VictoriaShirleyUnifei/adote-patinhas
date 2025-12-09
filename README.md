@@ -1,36 +1,82 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Adote Patinhas 🐾
 
-## Getting Started
+Adote Patinhas é um site de adoção de pets, pensado para facilitar o encontro entre animais disponíveis para adoção e novos tutores. O projeto oferece uma experiência completa para usuários, incluindo cadastro, login, gerenciamento de perfil e cadastro de pets.
 
-First, run the development server:
 
+## Funcionalidades
+
+### Autenticação
+- **Cadastro de usuário:** Permite criar uma conta com informações pessoais.
+- **Login:** Acesso seguro ao sistema.
+
+### Home
+- **Exibição de pets:** Cards com informações dos animais disponíveis para adoção.
+- **Filtros:** Possibilidade de filtrar por espécie, raça e porte.
+- **Cadastro de pet:** Botão para adicionar um novo animal (para usuários logados).
+
+### Perfil do Usuário
+- **Dados pessoais:** Visualização e edição das informações do usuário.
+- **Animais cadastrados:** Tab com os pets cadastrados pelo usuário.
+
+### Interface
+- **Dark Mode:** Tema escuro para melhor experiência visual.
+
+
+
+## Tecnologias Utilizadas
+- Frontend e Backend: Next.js
+- Estilização: Tailwind e Material UI
+
+
+## Como rodar o projeto
+
+1. Clone o repositório:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/seu-usuario/adote-patinhas.git
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Instale as dependências:
+```bash
+npm install
+# ou
+yarn install
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+3. Inicie o servidor de desenvolvimento:
+```bash
+npm run dev
+# ou
+yarn dev
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+4. Acesse no navegador:
+http://localhost:3000
 
-## Learn More
 
-To learn more about Next.js, take a look at the following resources:
+## Estrutura do Projeto
+O projeto é organizado seguindo as melhores práticas do Next.js 14 com App Router, utilizando uma arquitetura modular e bem separada por responsabilidades.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+`app/` - Páginas do Next.js e Rotas
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- `(private)/` - Páginas privadas
 
-## Deploy on Vercel
+- `(public)/` - Páginas públicas
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- `api/` - Endpoints da API para comunicação com o backend
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+`components/` -  Componentes Reutilizáveis do sistema
+
+`context/` -  Gerenciamento de Estados Global
+
+`db/` -  Banco de Dados Local
+
+`hooks/` - Custom Hooks
+
+`lib/` - Utilitários e Configurações
+
+`schemas/` - Validação de Dados
+
+`types/` - Tipagens TypeScript
+
+`utils/` - Funções Auxiliares
+
