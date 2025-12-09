@@ -2,9 +2,7 @@ import { z } from "zod";
 import dayjs from "dayjs";
 
 export const registerAnimalSchema = z.object({
-  foto: z
-    .any()
-    .refine((file) => file instanceof File, "É necessário enviar uma foto"),
+  foto: z.union([z.instanceof(File), z.string()]).or(z.null()).optional(),
   nome: z.string().min(1, "O nome é obrigatório"),
   especie: z
     .string()
