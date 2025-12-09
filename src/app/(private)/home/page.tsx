@@ -3,35 +3,39 @@
 import CustomButton from "@/components/Buttons/CustomButton";
 import CardAnimal from "@/components/Cards/CardAnimal";
 import Filter, { FilterValues } from "@/components/Filter/Filter";
-import ModalRegisterAnimal from "@/components/Modals/ModalRegisterAnimal";
 import { PetsOutlined } from "@mui/icons-material";
-import { Card } from "@mui/material";
+import { Card, CircularProgress, Box } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Animal } from "@/types/animal";
+import ModalAnimal from "@/components/Modals/ModalAnimal";
 
 export default function HomePage() {
   const theme = useTheme();
-  const [openModal, setOpenModal] = React.useState(false);
-  const [animals, setAnimals] = React.useState<Animal[]>([]);
-  const [filters, setFilters] = React.useState<FilterValues>({
+  const [openModal, setOpenModal] = useState(false);
+  const [animals, setAnimals] = useState<Animal[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [filters, setFilters] = useState<FilterValues>({
     species: "",
     size: "",
     breed: "",
   });
-  const [appliedFilters, setAppliedFilters] = React.useState<FilterValues>({
+  const [appliedFilters, setAppliedFilters] = useState<FilterValues>({
     species: "",
     size: "",
     breed: "",
   });
 
   const loadAnimals = useCallback(async () => {
+    setLoading(true);
     try {
       const res = await fetch("/api/pets");
       const data = await res.json();
       setAnimals(data);
     } catch (error) {
       console.error("Erro ao carregar animais:", error);
+    } finally {
+      setLoading(false);
     }
   }, []);
 
@@ -61,17 +65,51 @@ export default function HomePage() {
         !appliedFilters.breed ||
         animal.raca?.toLowerCase().includes(appliedFilters.breed.toLowerCase());
 
-      // const matchLocation =
-      //   !appliedFilters.location ||
-      //   animal.distance
-      //     ?.toLowerCase()
-      //     .includes(appliedFilters.location.toLowerCase());
-
       return matchSpecies && matchSize && matchBreed;
     });
   }, [animals, appliedFilters]); 
 
   const renderCards = () => {
+    if (loading) {
+      return (
+        <Box 
+          display="flex" 
+          justifyContent="center" 
+          alignItems="center" 
+          width="100%" 
+          height="300px"
+        >
+          <CircularProgress 
+            size={60} 
+            sx={{ 
+              color: theme.palette.primary.main 
+            }} 
+          />
+        </Box>
+      );
+    }
+
+    if (filteredAnimals.length === 0) {
+      return (
+        <Box 
+          display="flex" 
+          flexDirection="column" 
+          justifyContent="center" 
+          alignItems="center" 
+          width="100%" 
+          height="300px"
+          color="text.secondary"
+        >
+          <PetsOutlined sx={{ fontSize: 60, mb: 2, opacity: 0.5 }} />
+          <p className="text-lg font-medium">
+            {animals.length === 0 
+              ? "Nenhum animal cadastrado" 
+              : "Nenhum animal encontrado com os filtros aplicados"}
+          </p>
+        </Box>
+      );
+    }
+
     return filteredAnimals.map((animal) => (
       <CardAnimal
         key={animal.id}
@@ -122,7 +160,7 @@ export default function HomePage() {
         </div>
       </div>
 
-      <ModalRegisterAnimal
+      <ModalAnimal
         open={openModal}
         onClose={() => setOpenModal(false)}
         onSuccess={loadAnimals}
