@@ -13,11 +13,15 @@ import ModalViewAnimal from "../Modals/ModalViewAnimal";
 import { Animal } from "@/types/animal";
 import { formatAgeFromDate } from "@/utils/formatAge";
 import { capitalize } from "@/utils/capitalize";
+import ModalRegisterAnimal from "../Modals/ModalRegisterAnimal";
+
 interface CardAnimalProps {
   animal: Animal;
   variant?: "default" | "interested" | "myPets";
   onInterestToggle?: (animalId: string, interested: boolean) => void;
   onAdopt?: (animalId: string) => void;
+  onEdit?: (animalId: string) => void;
+  onDelete?: (animalId: string) => void;
   showInterestButton?: boolean;
 }
 
@@ -26,11 +30,15 @@ export default function CardAnimal({
   variant = "default",
   onInterestToggle,
   onAdopt,
-  showInterestButton = true 
+  onEdit,
+  onDelete,
+  showInterestButton = true
 }: CardAnimalProps) {
   const theme = useTheme();
-  const [openModal, setOpenModal] = React.useState(false);
+  const [openViewModal, setOpenViewModal] = React.useState(false);
+  const [openEditModal, setOpenEditModal] = React.useState(false);
 
+  // Cria handlers que não recebem parâmetros
   const handleInterestClick = () => {
     if (onInterestToggle) {
       onInterestToggle(animal.id, !animal.isInterested);
@@ -43,19 +51,69 @@ export default function CardAnimal({
     }
   };
 
+  const handleEditClick = () => {
+    if (onEdit) {
+      onEdit(animal.id);
+    }
+    setOpenEditModal(true);
+  };
+
+  const handleDeleteClick = () => {
+    if (onDelete && confirm("Tem certeza que deseja excluir este pet?")) {
+      onDelete(animal.id);
+    }
+  };
+
+  // Cria handlers que recebem evento para parar propagação
+  const handleInterestClickWithStopPropagation = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    handleInterestClick();
+  };
+
+  const handleAdoptClickWithStopPropagation = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    handleAdoptClick();
+  };
+
+  const handleEditClickWithStopPropagation = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    handleEditClick();
+  };
+
+  const handleDeleteClickWithStopPropagation = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    handleDeleteClick();
+  };
+
+  // Para o botão no CardAnimal que usa onClick direto no elemento
+  const handleCardClick = () => {
+    if (variant === "myPets") {
+      setOpenEditModal(true);
+    } else {
+      setOpenViewModal(true);
+    }
+  };
+
+  const handleVerMaisClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    handleCardClick();
+  };
+
   const getButtonConfig = () => {
     switch (variant) {
       case "interested":
         return {
           text: "Remover interesse",
           backgroundColor: theme.palette.error.main,
-          onClick: handleInterestClick
+          onClick: handleInterestClick,
+          onClickWithEvent: handleInterestClickWithStopPropagation
         };
       case "myPets":
         return {
           text: "Marcar como adotado",
           backgroundColor: theme.palette.success.main,
-          onClick: handleAdoptClick
+          onClick: handleAdoptClick,
+          onClickWithEvent: handleAdoptClickWithStopPropagation
         };
       default:
         return {
@@ -63,7 +121,8 @@ export default function CardAnimal({
           backgroundColor: animal.isInterested 
             ? theme.palette.error.main 
             : theme.palette.secondary.main,
-          onClick: handleInterestClick
+          onClick: handleInterestClick,
+          onClickWithEvent: handleInterestClickWithStopPropagation
         };
     }
   };
@@ -91,7 +150,14 @@ export default function CardAnimal({
           flexShrink: 0,
           padding: "12px",
           maxHeight: "fit-content", 
+          cursor: "pointer",
+          '&:hover': {
+            boxShadow: 2,
+            transform: 'translateY(-2px)',
+            transition: 'all 0.2s ease-in-out'
+          }
         }}
+        onClick={handleCardClick}
       >
         <div className="flex justify-between">
           <p className="font-semibold" style={{ color: theme.palette.text.primary }}>
@@ -145,34 +211,51 @@ export default function CardAnimal({
           </div>
         </div>
 
-        {showInterestButton && (
-          <CustomButton
-            textButton={buttonConfig.text}
-            backgroundColor={buttonConfig.backgroundColor}
-            color={theme.palette.text.primary}
-            fullWidth
-            onClick={buttonConfig.onClick}
-          />
+        {showInterestButton && variant !== "myPets" && (
+          <div onClick={(e) => e.stopPropagation()}>
+            <CustomButton
+              textButton={buttonConfig.text}
+              backgroundColor={buttonConfig.backgroundColor}
+              color={theme.palette.text.primary}
+              fullWidth
+              onClick={buttonConfig.onClick}
+            />
+          </div>
         )}
 
         <div
           className="flex justify-center items-center text-sm font-semibold cursor-pointer"
           style={{ color: theme.palette.text.primary }}
-          onClick={() => setOpenModal(true)}
+          onClick={handleVerMaisClick}
         >
-          <p>Ver mais</p>
+          <p>{variant === "myPets" ? "Editar" : "Ver mais"}</p>
           <ArrowDropDownOutlined />
         </div>
       </Box>
 
+      {/* Modal de visualização (para outros usuários) */}
       <ModalViewAnimal 
-        open={openModal} 
-        onClose={() => setOpenModal(false)}
+        open={openViewModal} 
+        onClose={() => setOpenViewModal(false)}
         animal={animal}
         variant={variant}
         onInterestToggle={onInterestToggle}
         onAdopt={onAdopt}
       />
+
+      {/* Modal de edição (para meus pets) */}
+      {variant === "myPets" && (
+        <ModalRegisterAnimal 
+          open={openEditModal} 
+          onClose={() => setOpenEditModal(false)}
+          animal={animal}
+          mode="edit"
+          onSuccess={() => {
+            setOpenEditModal(false);
+            // Atualize a lista de animais se necessário
+          }}
+        />
+      )}
     </>
   );
 }
